@@ -37,4 +37,8 @@ export const env = Object.freeze({
     password: readRequired('DB_PASSWORD'),
     connectionLimit: readInteger('DB_CONNECTION_LIMIT', 10),
   }),
+  auth: Object.freeze({
+    tokenSecret: readRequired('AUTH_TOKEN_SECRET'),
+    tokenTtlSeconds: readInteger('AUTH_TOKEN_TTL_SECONDS', 28_800),
+  }),
 });

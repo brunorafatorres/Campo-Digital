@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/database/pool.js && node --check src/routes/health.routes.js",
+    "db:migrate": "node src/database/migrate.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/database/pool.js && node --check src/database/migrate.js && node --check src/routes/health.routes.js && node --check src/auth/auth.routes.js && node --check src/auth/auth.service.js && node --check src/auth/auth.repository.js && node --check src/auth/password.js && node --check src/auth/token.js && node --check src/auth/require-auth.js",
     "test": "node --test"
   },
   "dependencies": {

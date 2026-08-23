@@ -1,10 +1,4 @@
-CREATE DATABASE IF NOT EXISTS campodigital
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_0900_ai_ci;
-
-USE campodigital;
-
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   nombre VARCHAR(120) NOT NULL,
   email VARCHAR(254) NOT NULL,
@@ -17,7 +11,7 @@ CREATE TABLE usuarios (
   UNIQUE KEY uk_usuarios_email (email)
 ) ENGINE = InnoDB;
 
-CREATE TABLE actividades_productivas (
+CREATE TABLE IF NOT EXISTS actividades_productivas (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   usuario_id BIGINT UNSIGNED NOT NULL,
   nombre VARCHAR(120) NOT NULL,
@@ -33,7 +27,7 @@ CREATE TABLE actividades_productivas (
     ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE categorias_financieras (
+CREATE TABLE IF NOT EXISTS categorias_financieras (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   usuario_id BIGINT UNSIGNED NULL,
   nombre VARCHAR(100) NOT NULL,
@@ -42,8 +36,10 @@ CREATE TABLE categorias_financieras (
   activa BOOLEAN NOT NULL DEFAULT TRUE,
   creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  propietario_clave BIGINT UNSIGNED
+    GENERATED ALWAYS AS (COALESCE(usuario_id, 0)) STORED,
   PRIMARY KEY (id),
-  UNIQUE KEY uk_categorias_usuario_nombre_tipo (usuario_id, nombre, tipo),
+  UNIQUE KEY uk_categorias_propietario_nombre_tipo (propietario_clave, nombre, tipo),
   KEY idx_categorias_usuario_tipo (usuario_id, tipo),
   CONSTRAINT ck_categorias_propietario
     CHECK (
@@ -56,7 +52,7 @@ CREATE TABLE categorias_financieras (
     ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE movimientos_financieros (
+CREATE TABLE IF NOT EXISTS movimientos_financieros (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   usuario_id BIGINT UNSIGNED NOT NULL,
   actividad_productiva_id BIGINT UNSIGNED NULL,
@@ -86,7 +82,7 @@ CREATE TABLE movimientos_financieros (
     ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
-INSERT INTO categorias_financieras (usuario_id, nombre, tipo, es_sistema)
+INSERT IGNORE INTO categorias_financieras (usuario_id, nombre, tipo, es_sistema)
 VALUES
   (NULL, 'Venta de producción', 'INGRESO', TRUE),
   (NULL, 'Otros ingresos', 'INGRESO', TRUE),

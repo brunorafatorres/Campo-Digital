@@ -5,6 +5,7 @@ process.env.DB_HOST = '127.0.0.1';
 process.env.DB_NAME = 'campodigital_test';
 process.env.DB_USER = 'campodigital_test';
 process.env.DB_PASSWORD = 'test_only';
+process.env.AUTH_TOKEN_SECRET = 'test_secret_with_at_least_32_characters';
 
 const { createApp } = await import('../src/app.js');
 
