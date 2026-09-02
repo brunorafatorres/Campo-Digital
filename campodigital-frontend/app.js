@@ -221,6 +221,10 @@ function escapeHtml(value) {
 
 $('#login-tab').addEventListener('click', () => setMode('login'));
 $('#register-tab').addEventListener('click', () => setMode('register'));
+$('#toggle-password').addEventListener(
+  'click',
+  togglePasswordVisibility
+);
 $('#auth-form').addEventListener('submit', submitAuth);
 $('#logout').addEventListener('click', logout);
 $('#activity-form').addEventListener('submit', saveActivity);
@@ -239,4 +243,18 @@ $('.category-columns').addEventListener('click', (event) => {
 
 if (state.token) {
   enterApp().catch(() => logout());
+}
+
+function togglePasswordVisibility() {
+  const passwordInput = $('#password');
+  const toggleButton = $('#toggle-password');
+  const isVisible = passwordInput.type === 'text';
+
+  passwordInput.type = isVisible ? 'password' : 'text';
+  toggleButton.textContent = isVisible ? 'Mostrar' : 'Ocultar';
+  toggleButton.setAttribute(
+    'aria-label',
+    isVisible ? 'Mostrar senha' : 'Ocultar senha'
+  );
+  toggleButton.setAttribute('aria-pressed', String(!isVisible));
 }

@@ -53,10 +53,30 @@
               <span>E-mail</span>
               <input id="email" name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com">
             </label>
-            <label class="field">
-              <span>Senha</span>
-              <input id="password" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="Mínimo de 8 caracteres">
-            </label>
+            <div class="field">
+              <label for="password">Senha</label>
+
+              <div class="password-field">
+              <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              autocomplete="current-password" 
+              minlength="8" 
+              required 
+              placeholder="Mínimo de 8 caracteres"
+              >
+              <button
+              id="toggle-password"
+              class="password-toggle"
+              type="button"
+              aria-label="Mostrar contraseña"
+              aria-pressed="false"
+              >  
+              Mostrar
+              </button>
+              </div>
+            </div>
             <p id="form-error" class="form-error" role="alert"></p>
             <button id="submit-auth" class="primary-button" type="submit">Entrar</button>
           </form>

@@ -176,3 +176,25 @@ button { cursor: pointer; }
     width: 150px;
   }
 }
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 90px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: 0;
+  padding: 5px;
+  color: var(--forest-2);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+}
+

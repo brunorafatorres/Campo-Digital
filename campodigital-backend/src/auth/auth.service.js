@@ -5,7 +5,7 @@ function badRequest(message) {
   return Object.assign(new Error(message), { status: 400 });
 }
 
-function unauthorized(message = 'Credenciales inválidas.') {
+function unauthorized(message = 'Credencias inválidas.') {
   return Object.assign(new Error(message), { status: 401 });
 }
 
@@ -19,15 +19,15 @@ function validateRegistration(input) {
   const password = typeof input.password === 'string' ? input.password : '';
 
   if (nombre.length < 2 || nombre.length > 120) {
-    throw badRequest('El nombre debe tener entre 2 y 120 caracteres.');
+    throw badRequest('O nome deve conter entre 2 e 120 caracteres.');
   }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
-    throw badRequest('El email no es válido.');
+    throw badRequest('O email nao é válido.');
   }
 
   if (password.length < 8 || password.length > 128) {
-    throw badRequest('La contraseña debe tener entre 8 y 128 caracteres.');
+    throw badRequest('A senha deve conter pelo menos 8 caracteres.');
   }
 
   return { nombre, email, password };
@@ -56,7 +56,7 @@ export function createAuthService(repository, tokenOptions) {
       const data = validateRegistration(input);
 
       if (await repository.findByEmail(data.email)) {
-        throw Object.assign(new Error('Ya existe un usuario con ese email.'), { status: 409 });
+        throw Object.assign(new Error('Já existe um usuário com esse email'), { status: 409 });
       }
 
       const passwordHash = await hashPassword(data.password);
@@ -80,7 +80,7 @@ export function createAuthService(repository, tokenOptions) {
       const user = await repository.findPublicById(id);
 
       if (!user || !user.activo) {
-        throw unauthorized('La sesión ya no es válida.');
+        throw unauthorized('A sessao já nao é válida.');
       }
 
       return publicUser(user);
