@@ -24,6 +24,16 @@ El usuario `campodigital` queda limitado a la base del proyecto. No uses la cuen
 - `POST /api/auth/register`: registra un productor e inicia su sesión.
 - `POST /api/auth/login`: inicia sesión.
 - `GET /api/auth/me`: devuelve el usuario autenticado; requiere `Authorization: Bearer <token>`.
+- `GET /api/actividades`: lista las actividades productivas propias.
+- `POST /api/actividades`: crea una actividad productiva.
+- `PUT /api/actividades/:id`: actualiza una actividad propia.
+- `GET /api/categorias`: lista categorías del sistema y propias.
+- `POST /api/categorias`: crea una categoría propia.
+- `PATCH /api/categorias/:id/desactivar`: desactiva una categoría propia.
+
+## Frontend
+
+Con la API iniciada, abre `http://localhost:3000`. La interfaz utiliza HTML, CSS y JavaScript y ya permite registrarse, iniciar sesión, gestionar actividades productivas y categorías. No necesita iniciar otro servidor.
 
 Ejemplo:
 
@@ -44,4 +54,4 @@ Guarda el `accessToken` de la respuesta para las rutas protegidas. La contraseñ
 
 ## Alcance actual
 
-Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales y autenticación por token. Los movimientos y los resúmenes financieros se incorporarán de forma incremental.
+Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales, autenticación por token, perfil productivo, categorías y un frontend responsivo. Los movimientos y los resúmenes financieros se incorporarán de forma incremental.

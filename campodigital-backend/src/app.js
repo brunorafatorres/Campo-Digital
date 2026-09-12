@@ -1,10 +1,17 @@
 import express from 'express';
+import { fileURLToPath } from 'node:url';
 
+import { createActivityRepository } from './activities/activity.repository.js';
+import { createActivityRouter } from './activities/activity.routes.js';
+import { createActivityService } from './activities/activity.service.js';
 import { createAuthRepository } from './auth/auth.repository.js';
 import { createAuthRouter } from './auth/auth.routes.js';
 import { createAuthService } from './auth/auth.service.js';
 import { createRequireAuth } from './auth/require-auth.js';
 import { env } from './config/env.js';
+import { createCategoryRepository } from './categories/category.repository.js';
+import { createCategoryRouter } from './categories/category.routes.js';
+import { createCategoryService } from './categories/category.service.js';
 import { pool } from './database/pool.js';
 import { healthRouter } from './routes/health.routes.js';
 
@@ -17,12 +24,21 @@ export function createApp(overrides = {}) {
   const authRepository = overrides.authRepository ?? createAuthRepository(pool);
   const authService = overrides.authService ?? createAuthService(authRepository, tokenOptions);
   const requireAuth = createRequireAuth(tokenOptions);
+  const activityService = overrides.activityService
+    ?? createActivityService(createActivityRepository(pool));
+  const categoryService = overrides.categoryService
+    ?? createCategoryService(createCategoryRepository(pool));
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
 
   app.use('/health', healthRouter);
   app.use('/api/auth', createAuthRouter(authService, requireAuth));
+  app.use('/api/actividades', createActivityRouter(activityService, requireAuth));
+  app.use('/api/categorias', createCategoryRouter(categoryService, requireAuth));
+
+  const publicDirectory = fileURLToPath(new URL('../public', import.meta.url));
+  app.use(express.static(publicDirectory));
 
   app.use((request, response) => {
     response.status(404).json({

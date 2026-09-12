@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CampoDigital — gestão financeira simples para produtores rurais.">
+    <title>CampoDigital</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <main id="auth-view" class="auth-shell">
+      <section class="brand-panel" aria-labelledby="brand-title">
+        <a class="brand" href="/" aria-label="CampoDigital, página inicial">
+          <span class="brand-mark" aria-hidden="true">C</span>
+          <span>CampoDigital</span>
+        </a>
+        <div class="brand-copy">
+          <p class="eyebrow">Gestão rural sem complicação</p>
+          <h1 id="brand-title">Suas finanças do campo, organizadas em um só lugar.</h1>
+          <p>Registre receitas e despesas, acompanhe seus resultados e tome decisões com mais segurança.</p>
+        </div>
+        <div class="brand-benefits" aria-label="Benefícios">
+          <div><span aria-hidden="true">✓</span> Fácil de usar</div>
+          <div><span aria-hidden="true">✓</span> Dados separados por produtor</div>
+          <div><span aria-hidden="true">✓</span> Acesso pelo computador ou celular</div>
+        </div>
+      </section>
+
+      <section class="auth-panel">
+        <div class="auth-card">
+          <p class="mobile-brand">CampoDigital</p>
+          <div class="auth-heading">
+            <p class="eyebrow">Bem-vindo</p>
+            <h2 id="auth-title">Entre na sua conta</h2>
+            <p id="auth-subtitle">Acesse seu painel financeiro.</p>
+          </div>
+
+          <div class="auth-tabs" role="tablist" aria-label="Acesso à conta">
+            <button id="login-tab" class="auth-tab active" type="button" role="tab" aria-selected="true">Entrar</button>
+            <button id="register-tab" class="auth-tab" type="button" role="tab" aria-selected="false">Criar conta</button>
+          </div>
+
+          <form id="auth-form" novalidate>
+            <label id="name-field" class="field hidden">
+              <span>Nome completo</span>
+              <input id="name" name="name" autocomplete="name" minlength="2" maxlength="120" placeholder="Como podemos chamar você?">
+            </label>
+            <label class="field">
+              <span>E-mail</span>
+              <input id="email" name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com">
+            </label>
+            <div class="field">
+              <label for="password">Senha</label>
+              <div class="password-field">
+                <input id="password" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="Mínimo de 8 caracteres">
+                <button id="toggle-password" class="password-toggle" type="button" aria-label="Mostrar senha" aria-pressed="false">Mostrar</button>
+              </div>
+            </div>
+            <p id="form-error" class="form-error" role="alert"></p>
+            <button id="submit-auth" class="primary-button" type="submit">Entrar</button>
+          </form>
+          <p class="security-note"><span aria-hidden="true">●</span> Sua senha é armazenada de forma protegida.</p>
+        </div>
+      </section>
+    </main>
+
+    <div id="app-view" class="app-shell hidden">
+      <aside class="sidebar">
+        <a class="brand sidebar-brand" href="/">
+          <span class="brand-mark" aria-hidden="true">C</span>
+          <span>CampoDigital</span>
+        </a>
+        <nav aria-label="Menu principal">
+          <button class="nav-item active" data-section="dashboard"><span aria-hidden="true">▦</span> Visão geral</button>
+          <button class="nav-item" data-section="profile"><span aria-hidden="true">♧</span> Minha produção</button>
+          <button class="nav-item" data-section="categories"><span aria-hidden="true">≡</span> Categorias</button>
+          <button class="nav-item disabled" type="button"><span aria-hidden="true">↕</span> Movimentações <small>Em breve</small></button>
+        </nav>
+        <button id="logout" class="logout-button" type="button">Sair da conta</button>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <button id="mobile-menu" class="mobile-menu" type="button" aria-label="Abrir menu">☰</button>
+          <div>
+            <p class="topbar-kicker">Painel do produtor</p>
+            <h1 id="welcome-title">Olá!</h1>
+          </div>
+          <div class="user-chip"><span id="user-initial">P</span><div><strong id="user-name">Produtor</strong><small>Produtor rural</small></div></div>
+        </header>
+
+        <section id="dashboard-section" class="content-section">
+          <div class="section-heading">
+            <div><p class="eyebrow">Resumo financeiro</p><h2>Visão geral</h2></div>
+            <span class="period-chip">Mês atual</span>
+          </div>
+          <div class="summary-grid">
+            <article class="summary-card income"><span>Receitas</span><strong>R$ 0,00</strong><small>Movimentações serão o próximo módulo</small></article>
+            <article class="summary-card expense"><span>Despesas</span><strong>R$ 0,00</strong><small>Sem despesas registradas</small></article>
+            <article class="summary-card balance"><span>Saldo</span><strong>R$ 0,00</strong><small>Receitas menos despesas</small></article>
+          </div>
+          <div class="dashboard-grid">
+            <article class="surface getting-started">
+              <div><p class="eyebrow">Primeiros passos</p><h3>Prepare sua conta</h3></div>
+              <ol>
+                <li id="step-account" class="done"><span>✓</span><div><strong>Conta criada</strong><small>Seu acesso já está protegido.</small></div></li>
+                <li id="step-activity"><span>2</span><div><strong>Cadastre sua produção</strong><small>Informe sua principal atividade rural.</small></div><button data-go="profile">Cadastrar</button></li>
+                <li id="step-category"><span>3</span><div><strong>Organize as categorias</strong><small>Crie categorias que combinam com seu negócio.</small></div><button data-go="categories">Organizar</button></li>
+              </ol>
+            </article>
+            <article class="surface support-card">
+              <span class="support-icon" aria-hidden="true">?</span>
+              <h3>Precisa de ajuda?</h3>
+              <p>Use os textos simples de cada tela para completar seu cadastro.</p>
+              <small>Versão inicial do TCC CampoDigital</small>
+            </article>
+          </div>
+        </section>
+
+        <section id="profile-section" class="content-section hidden">
+          <div class="section-heading"><div><p class="eyebrow">Perfil produtivo</p><h2>Minha produção</h2><p>Conte qual é a principal atividade desenvolvida na propriedade.</p></div></div>
+          <div class="form-layout">
+            <form id="activity-form" class="surface form-card">
+              <input id="activity-id" type="hidden">
+              <label class="field"><span>Nome da atividade</span><input id="activity-name" required minlength="2" maxlength="120" placeholder="Ex.: Criação de gado"></label>
+              <label class="field"><span>Descrição <small>(opcional)</small></span><textarea id="activity-description" maxlength="500" rows="5" placeholder="Conte um pouco sobre sua produção"></textarea></label>
+              <label id="activity-active-field" class="toggle-row hidden"><input id="activity-active" type="checkbox" checked><span>Atividade ativa</span></label>
+              <p id="activity-error" class="form-error" role="alert"></p>
+              <button class="primary-button fit" type="submit">Salvar atividade</button>
+            </form>
+            <aside class="surface info-card"><span aria-hidden="true">♧</span><h3>Por que informar?</h3><p>Isso ajuda o sistema a organizar melhor suas informações e preparar recomendações adequadas à realidade da propriedade.</p></aside>
+          </div>
+          <div id="activity-list" class="item-list"></div>
+        </section>
+
+        <section id="categories-section" class="content-section hidden">
+          <div class="section-heading"><div><p class="eyebrow">Organização financeira</p><h2>Categorias</h2><p>Use as categorias padrão ou crie categorias próprias.</p></div></div>
+          <form id="category-form" class="surface inline-form">
+            <label class="field"><span>Nome da categoria</span><input id="category-name" required minlength="2" maxlength="100" placeholder="Ex.: Venda de leite"></label>
+            <label class="field"><span>Tipo</span><select id="category-type"><option value="INGRESO">Receita</option><option value="GASTO">Despesa</option></select></label>
+            <button class="primary-button fit" type="submit">Adicionar categoria</button>
+            <p id="category-error" class="form-error" role="alert"></p>
+          </form>
+          <div class="category-columns">
+            <section><div class="list-heading"><h3>Receitas</h3><span id="income-count">0</span></div><div id="income-categories" class="category-list"></div></section>
+            <section><div class="list-heading"><h3>Despesas</h3><span id="expense-count">0</span></div><div id="expense-categories" class="category-list"></div></section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
