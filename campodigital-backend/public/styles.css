@@ -163,3 +163,40 @@ button { cursor: pointer; }
   .getting-started li { grid-template-columns: 34px 1fr; }
   .getting-started li button { grid-column: 2; width: fit-content; padding: 0; }
 }
+
+/* Movimentações financeiras */
+.movement-form-grid, .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; margin-top: 24px; }
+.movement-form-grid .field, .filter-grid .field { margin: 0; }
+.movement-description-field { grid-column: 1 / -1; }
+.movement-filters { margin-top: 24px; padding: 26px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.secondary-button { border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; color: var(--forest); background: white; font-weight: 700; }
+button:disabled { cursor: default; opacity: .55; }
+button:focus-visible { outline: 2px solid var(--forest-2); outline-offset: 3px; }
+.filter-note, #dashboard-context, #movement-count { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: white; }
+.movement-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.movement-table th, .movement-table td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.movement-table th { color: var(--muted); background: #f0f4ed; font-size: 12px; }
+.movement-table tr:last-child td { border-bottom: 0; }
+.movement-description { min-width: 180px; max-width: 340px; overflow-wrap: anywhere; }
+.money-cell { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.type-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+.type-badge.income { color: #245537; background: #e6f2e4; }
+.type-badge.expense { color: #873c30; background: #f8e8e2; }
+.row-actions { display: flex; gap: 12px; }
+.row-actions button { border: 0; padding: 2px; color: var(--forest); background: none; font-weight: 700; }
+.row-actions .danger-link, .negative { color: var(--danger); }
+.pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; font-size: 13px; }
+.confirm-dialog { max-width: min(480px, calc(100% - 32px)); padding: 28px; border: 1px solid var(--line); border-radius: 18px; color: var(--ink); }
+.confirm-dialog::backdrop { background: rgba(10, 30, 20, .5); }
+.confirm-dialog p { overflow-wrap: anywhere; line-height: 1.6; }
+.danger-button { border: 0; border-radius: 10px; padding: 12px 18px; color: white; background: var(--danger); font-weight: 700; }
+#period-label { white-space: normal; text-align: right; }
+.summary-card strong { overflow-wrap: anywhere; }
+@media (max-width: 620px) {
+  .movement-form-grid, .filter-grid { grid-template-columns: 1fr; }
+  .movement-filters { padding: 20px; }
+  .button-row > button { flex: 1 1 auto; }
+  .movement-table th, .movement-table td { padding: 12px; }
+}

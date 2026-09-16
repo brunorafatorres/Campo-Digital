@@ -97,7 +97,7 @@
           <button class="nav-item active" data-section="dashboard"><span aria-hidden="true">▦</span> Visão geral</button>
           <button class="nav-item" data-section="profile"><span aria-hidden="true">♧</span> Minha produção</button>
           <button class="nav-item" data-section="categories"><span aria-hidden="true">≡</span> Categorias</button>
-          <button class="nav-item" type="button"><span aria-hidden="true">↕</span> Movimentações <small></small></button>
+          <button class="nav-item" type="button" data-section="movements"><span aria-hidden="true">↕</span> Movimentações</button>
         </nav>
         <button id="logout" class="logout-button" type="button">Sair da conta</button>
       </aside>
@@ -115,13 +115,15 @@
         <section id="dashboard-section" class="content-section">
           <div class="section-heading">
             <div><p class="eyebrow">Resumo financeiro</p><h2>Visão geral</h2></div>
-            <span class="period-chip">Mês atual</span>
+            <span id="period-label" class="period-chip">Mês atual</span>
           </div>
           <div class="summary-grid">
-            <article class="summary-card income"><span>Receitas</span><strong>R$ 0,00</strong><small></small></article>
-            <article class="summary-card expense"><span>Despesas</span><strong>R$ 0,00</strong><small>Sem despesas registradas</small></article>
-            <article class="summary-card balance"><span>Saldo</span><strong>R$ 0,00</strong><small>Receitas menos despesas</small></article>
+            <article class="summary-card income"><span>Receitas</span><strong id="total-income">—</strong><small>Receitas do período selecionado</small></article>
+            <article class="summary-card expense"><span>Despesas</span><strong id="total-expense">—</strong><small>Despesas do período selecionado</small></article>
+            <article class="summary-card balance"><span>Saldo</span><strong id="total-balance">—</strong><small>Receitas menos despesas</small></article>
           </div>
+          <p id="dashboard-context" role="status"></p>
+          <button class="secondary-button" type="button" data-go="movements">Ver movimentações e alterar filtros</button>
           <div class="dashboard-grid">
             <article class="surface getting-started">
               <div><p class="eyebrow">Primeiros passos</p><h3>Prepare sua conta</h3></div>
@@ -168,6 +170,51 @@
             <section><div class="list-heading"><h3>Despesas</h3><span id="expense-count">0</span></div><div id="expense-categories" class="category-list"></div></section>
           </div>
         </section>
+
+        <section id="movements-section" class="content-section hidden">
+          <div class="section-heading"><div><p class="eyebrow">Controle financeiro</p><h2>Movimentações</h2><p>Registre o que entra e sai da sua produção.</p></div></div>
+          <form id="movement-form" class="surface form-card">
+            <h3 id="movement-form-title">Nova movimentação</h3>
+            <div class="movement-form-grid">
+              <label class="field"><span>Tipo</span><select id="movement-type"><option value="INGRESO">Receita</option><option value="GASTO">Despesa</option></select></label>
+              <label class="field"><span>Valor (R$)</span><input id="movement-value" inputmode="decimal" required maxlength="15" pattern="[0-9]{1,12}([.,][0-9]{1,2})?" placeholder="Ex.: 150,50"><small>Sem separador de milhar.</small></label>
+              <label class="field"><span>Data</span><input id="movement-date" type="date" min="1000-01-01" max="9999-12-31" required></label>
+              <label class="field"><span>Categoria</span><select id="movement-category" required><option value="">Selecione uma categoria</option></select><small id="movement-category-help"></small></label>
+              <label class="field movement-description-field"><span>Descrição</span><input id="movement-description" required minlength="2" maxlength="255" placeholder="Ex.: Venda de leite da semana"></label>
+            </div>
+            <p id="movement-error" class="form-error" role="alert"></p>
+            <div class="button-row"><button id="movement-save" class="primary-button fit" type="submit">Salvar movimentação</button><button id="movement-cancel" class="secondary-button hidden" type="button">Cancelar edição</button></div>
+          </form>
+          <form id="movement-filters" class="surface movement-filters">
+            <h3>Consultar lançamentos</h3>
+            <div class="filter-grid">
+              <label class="field"><span>De</span><input id="filter-from" type="date" min="1000-01-01" max="9999-12-31"></label>
+              <label class="field"><span>Até</span><input id="filter-to" type="date" min="1000-01-01" max="9999-12-31"></label>
+              <label class="field"><span>Tipo</span><select id="filter-type"><option value="">Receitas e despesas</option><option value="INGRESO">Receitas</option><option value="GASTO">Despesas</option></select></label>
+              <label class="field"><span>Categoria</span><select id="filter-category"><option value="">Todas as categorias</option></select></label>
+            </div>
+            <div class="button-row"><button class="primary-button fit" type="submit">Aplicar filtros</button><button id="movement-clear-filters" class="secondary-button" type="button">Limpar filtros</button><button id="movement-retry" class="secondary-button" type="button">Atualizar</button></div>
+            <p class="filter-note">Os filtros também atualizam os totais da Visão geral.</p>
+          </form>
+          <p id="movement-list-error" class="form-error" role="alert"></p>
+          <p id="movement-loading" class="empty-state hidden" role="status">Carregando movimentações…</p>
+          <div id="movement-results" class="hidden">
+            <div class="list-heading"><h3>Lançamentos</h3><p id="movement-count"></p></div>
+            <p id="movement-empty" class="empty-state hidden">Nenhuma movimentação encontrada para estes filtros.</p>
+            <div id="movement-table-wrap" class="table-wrap" tabindex="0" role="region" aria-label="Lançamentos financeiros">
+              <table class="movement-table"><thead><tr><th scope="col">Data</th><th scope="col">Descrição</th><th scope="col">Categoria</th><th scope="col">Tipo</th><th scope="col">Valor</th><th scope="col">Ações</th></tr></thead><tbody id="movement-rows"></tbody></table>
+            </div>
+            <nav class="pagination" aria-label="Páginas de movimentações"><button id="movement-prev" class="secondary-button" type="button">Anterior</button><span id="movement-page" aria-live="polite"></span><button id="movement-next" class="secondary-button" type="button">Próxima</button></nav>
+          </div>
+        </section>
+        <dialog id="movement-delete-dialog" class="confirm-dialog" aria-labelledby="movement-delete-title">
+          <form method="dialog">
+            <h2 id="movement-delete-title">Excluir movimentação?</h2>
+            <p id="movement-delete-description"></p><p>Esta ação remove o lançamento e recalcula os totais.</p>
+            <p id="movement-delete-error" class="form-error" role="alert"></p>
+            <div class="button-row"><button class="secondary-button" value="cancel">Cancelar</button><button id="movement-delete-confirm" class="danger-button" type="button">Excluir movimentação</button></div>
+          </form>
+        </dialog>
       </main>
     </div>
 

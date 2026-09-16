@@ -14,7 +14,7 @@ export function createCategoryRouter(service, requireAuth) {
 
   router.get('/', async (request, response, next) => {
     try {
-      response.json({ categorias: await service.list(request.auth.sub, request.query.tipo) });
+      response.json({ categorias: await service.list(request.auth.sub, request.query.tipo, request.query.incluir_inativas) });
     } catch (error) {
       next(error);
     }

@@ -1,6 +1,6 @@
 export function createCategoryRepository(database) {
   return {
-    async listVisible(userId, tipo = null) {
+    async listVisible(userId, tipo = null, includeInactive = false) {
       const params = [userId];
       let typeFilter = '';
       if (tipo) {
@@ -13,7 +13,7 @@ export function createCategoryRepository(database) {
                 CASE WHEN usuario_id IS NULL THEN 'SISTEMA' ELSE 'PROPIA' END AS origen
            FROM categorias_financieras
           WHERE (usuario_id IS NULL OR usuario_id = ?)
-            AND activa = TRUE${typeFilter}
+            ${includeInactive ? '' : 'AND activa = TRUE'}${typeFilter}
           ORDER BY es_sistema DESC, tipo ASC, nombre ASC`,
         params,
       );

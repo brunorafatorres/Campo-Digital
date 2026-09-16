@@ -17,8 +17,11 @@ function readType(value, optional = false) {
 
 export function createCategoryService(repository) {
   return {
-    list(userId, tipo) {
-      return repository.listVisible(userId, readType(tipo, true));
+    list(userId, tipo, incluirInativas) {
+      if (incluirInativas !== undefined && !['true', 'false'].includes(incluirInativas)) {
+        throw badRequest('O filtro de categorias inativas deve ser true ou false.');
+      }
+      return repository.listVisible(userId, readType(tipo, true), incluirInativas === 'true');
     },
 
     async create(userId, input = {}) {

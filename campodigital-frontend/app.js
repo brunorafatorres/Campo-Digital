@@ -1,3 +1,5 @@
+import { createFinance } from './finance.js';
+
 const state = {
   mode: 'login',
   token: localStorage.getItem('campodigital_token'),
@@ -15,7 +17,7 @@ async function api(path, options = {}) {
   const response = await fetch(path, { ...options, headers });
   if (response.status === 204) return null;
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.message || 'Não foi possível concluir a operação.');
+  if (!response.ok) throw Object.assign(new Error(body.message || 'Não foi possível concluir a operação.'), { status: response.status });
   return body;
 }
 
@@ -74,8 +76,10 @@ async function submitAuth(event) {
 }
 
 async function enterApp() {
+  const token = state.token;
   if (!state.user) {
     const result = await api('/api/auth/me');
+    if (state.token !== token) return;
     state.user = result.usuario;
   }
   $('#auth-view').classList.add('hidden');
@@ -83,10 +87,21 @@ async function enterApp() {
   $('#user-name').textContent = state.user.nombre;
   $('#user-initial').textContent = state.user.nombre.slice(0, 1).toUpperCase();
   $('#welcome-title').textContent = `Olá, ${state.user.nombre.split(' ')[0]}!`;
-  await Promise.all([loadActivities(), loadCategories()]);
+  const results = await Promise.allSettled([loadActivities(), loadCategories()]);
+  if (state.token !== token) return;
+  const failure = results.find((result) => result.status === 'rejected');
+  if (failure) toast(failure.reason.message);
+  showSection('dashboard');
+  await finance.start();
 }
 
 function logout() {
+  finance.reset();
+  state.activities = [];
+  state.categories = [];
+  renderActivities();
+  renderCategories();
+  showSection('dashboard');
   localStorage.removeItem('campodigital_token');
   state.token = null;
   state.user = null;
@@ -104,7 +119,9 @@ function showSection(name) {
 }
 
 async function loadActivities() {
+  const token = state.token;
   const result = await api('/api/actividades');
+  if (state.token !== token) return;
   state.activities = result.actividades;
   renderActivities();
 }
@@ -163,8 +180,11 @@ function editActivity(id) {
 }
 
 async function loadCategories() {
-  const result = await api('/api/categorias');
-  state.categories = result.categorias;
+  const token = state.token;
+  const result = await api('/api/categorias?incluir_inativas=true');
+  if (state.token !== token) return;
+  state.categories = result.categorias.filter((item) => item.activa);
+  finance.setCategories(result.categorias);
   renderCategories();
 }
 
@@ -218,6 +238,8 @@ async function deactivateCategory(id) {
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
 }
+
+const finance = createFinance({ api, toast, onUnauthorized: logout });
 
 $('#login-tab').addEventListener('click', () => setMode('login'));
 $('#register-tab').addEventListener('click', () => setMode('register'));

@@ -13,6 +13,9 @@ import { createCategoryRepository } from './categories/category.repository.js';
 import { createCategoryRouter } from './categories/category.routes.js';
 import { createCategoryService } from './categories/category.service.js';
 import { pool } from './database/pool.js';
+import { createMovementRepository } from './movements/movement.repository.js';
+import { createMovementService } from './movements/movement.service.js';
+import { createMovementRouter } from './movements/movement.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 
 export function createApp(overrides = {}) {
@@ -28,6 +31,8 @@ export function createApp(overrides = {}) {
     ?? createActivityService(createActivityRepository(pool));
   const categoryService = overrides.categoryService
     ?? createCategoryService(createCategoryRepository(pool));
+  const movementService = overrides.movementService
+    ?? createMovementService(createMovementRepository(pool));
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
@@ -36,6 +41,7 @@ export function createApp(overrides = {}) {
   app.use('/api/auth', createAuthRouter(authService, requireAuth));
   app.use('/api/actividades', createActivityRouter(activityService, requireAuth));
   app.use('/api/categorias', createCategoryRouter(categoryService, requireAuth));
+  app.use('/api/movimientos', createMovementRouter(movementService, requireAuth));
 
   const publicDirectory = fileURLToPath(new URL('../public', import.meta.url));
   app.use(express.static(publicDirectory));

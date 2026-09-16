@@ -33,7 +33,7 @@ El usuario `campodigital` queda limitado a la base del proyecto. No uses la cuen
 
 ## Frontend
 
-Con la API iniciada, abre `http://localhost:3000`. La interfaz utiliza HTML, CSS y JavaScript y ya permite registrarse, iniciar sesión, gestionar actividades productivas y categorías. No necesita iniciar otro servidor.
+Con la API iniciada, abre `http://localhost:3000`. La interfaz utiliza HTML, CSS y JavaScript y ya permite registrarse, iniciar sesión, gestionar actividades productivas, categorías y movimientos financieros. No necesita iniciar otro servidor.
 
 Ejemplo:
 
@@ -54,4 +54,63 @@ Guarda el `accessToken` de la respuesta para las rutas protegidas. La contraseñ
 
 ## Alcance actual
 
-Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales, autenticación por token, perfil productivo, categorías y un frontend responsivo. Los movimientos y los resúmenes financieros se incorporarán de forma incremental.
+Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales, autenticación por token, perfil productivo, categorías y un frontend responsivo. También incluye registro, edición, eliminación y consulta de movimientos financieros con totales por período.
+
+## Movimentações financeiras (RF03 a RF07)
+
+Todas as rotas abaixo exigem `Authorization: Bearer <token>`. O produtor é identificado pelo token; `usuario_id` enviado no corpo não é usado.
+
+| Método | Rota | Resultado |
+|---|---|---|
+| GET | `/api/movimientos` | Movimentações, resumo e paginação |
+| GET | `/api/movimientos/resumen` | Receitas, despesas, saldo e quantidade |
+| POST | `/api/movimientos` | Cadastra uma receita ou despesa |
+| PUT | `/api/movimientos/:id` | Substitui os campos financeiros de um lançamento próprio |
+| DELETE | `/api/movimientos/:id` | Exclui um lançamento próprio e responde com 204 |
+
+Exemplo de corpo para POST e PUT:
+
+```json
+{
+  "tipo": "INGRESO",
+  "categoria_id": 1,
+  "descripcion": "Venda de leite",
+  "valor": "150.50",
+  "fecha": "2026-09-12"
+}
+```
+
+Use o ID de uma categoria disponível em sua conta; `1` acima é apenas um exemplo.
+
+- Tipos: `INGRESO` (receita) e `GASTO` (despesa).
+- Descrição: de 2 a 255 caracteres; data válida em `AAAA-MM-DD`.
+- Valor positivo, até 12 dígitos inteiros e duas casas decimais. O corpo aceita ponto ou vírgula decimal, sem separador de milhar. Os valores retornam como strings decimais; o MySQL calcula as somas em DECIMAL.
+- Categorias devem ser do sistema ou do próprio produtor e corresponder ao tipo do lançamento.
+- Uma categoria inativa pode ser mantida ao editar o lançamento que já a utilizava; não pode ser escolhida para um novo lançamento.
+- Edição/exclusão de um ID inexistente ou pertencente a outro produtor responde com 404.
+
+### Filtros e paginação
+
+`GET /api/movimientos?desde=2026-09-01&hasta=2026-09-30&tipo=GASTO&categoria_id=2&pagina=1`
+
+Os filtros são opcionais, combináveis e incluem ambas as datas. Sem período, a API consulta todo o histórico; a interface inicia no mês atual. A listagem traz 20 registros por página, ordenados por data e ID decrescentes. O resumo considera **todos** os registros que correspondem aos filtros, independentemente da página.
+
+`GET /api/categorias?incluir_inativas=true` inclui categorias arquivadas para consultar o histórico; a chamada padrão continua trazendo apenas as ativas.
+
+### Banco de dados
+
+Este módulo usa a tabela `movimientos_financieros` já existente em `migrations/001_core.sql`, com as categorias `es_sistema`/`activa`. Não há nova migração nesta etapa. Em uma instalação nova, execute `npm run db:migrate`; uma base criada com outra versão do SQL deve ser conferida antes de usar o módulo.
+
+### Validação
+
+```bash
+npm run check
+npm test
+node --test test/movements.test.js
+```
+
+A suíte contém 29 testes: 14 anteriores e 15 para movimentações. Os novos testes exercitam as rotas Express, os tokens e os serviços reais, utilizando um repositório de dados em memória (`test-support/movement-fixture.js`). Cobrem validações, permissões, categorias inativas, filtros, paginação e recálculo. **Não executam consultas em um servidor MySQL.**
+
+Para conferir com seu banco local: registre uma receita de R$ 150,50 e uma despesa de R$ 58,25 no mesmo período. O saldo deve ser R$ 92,25. Edite a receita para R$ 200,10 (saldo R$ 141,85), aplique os filtros e exclua a despesa (saldo R$ 200,10). Atualize a página para conferir a persistência e use uma segunda conta para verificar que ela não vê os lançamentos da primeira.
+
+A interface possui estados de carregamento/erro, confirmação antes da exclusão e suporte a telas pequenas. Gráficos e recursos de IA permanecem como etapas futuras.
