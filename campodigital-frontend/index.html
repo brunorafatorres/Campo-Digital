@@ -124,6 +124,18 @@
           </div>
           <p id="dashboard-context" role="status"></p>
           <button class="secondary-button" type="button" data-go="movements">Ver movimentações e alterar filtros</button>
+          <div class="finance-charts" aria-label="Gráficos financeiros">
+            <article class="surface chart-card">
+              <div class="chart-heading"><div><p class="eyebrow">Distribuição</p><h3>Valores por categoria</h3></div><span class="chart-legend"><i class="income"></i>Receita <i class="expense"></i>Despesa</span></div>
+              <p id="category-chart-empty" class="empty-state hidden">Cadastre movimentações para visualizar os valores por categoria.</p>
+              <div id="category-chart" class="category-chart" role="list"></div>
+            </article>
+            <article class="surface chart-card">
+              <div class="chart-heading"><div><p class="eyebrow">Evolução</p><h3>Receitas e despesas por mês</h3></div><span class="chart-legend"><i class="income"></i>Receita <i class="expense"></i>Despesa</span></div>
+              <p id="period-chart-empty" class="empty-state hidden">Ainda não há dados mensais neste período.</p>
+              <div id="period-chart" class="period-chart" role="list"></div>
+            </article>
+          </div>
           <div class="dashboard-grid">
             <article class="surface getting-started">
               <div><p class="eyebrow">Primeiros passos</p><h3>Prepare sua conta</h3></div>

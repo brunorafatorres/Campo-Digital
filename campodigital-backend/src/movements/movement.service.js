@@ -101,6 +101,15 @@ export function createMovementService(repository) {
       return repository.summarize(userId, readFilters(query));
     },
 
+    async charts(userId, query) {
+      const filters = readFilters(query);
+      const [categorias, periodos] = await Promise.all([
+        repository.summarizeByCategory(userId, filters),
+        repository.summarizeByMonth(userId, filters),
+      ]);
+      return { categorias, periodos };
+    },
+
     async create(userId, input) {
       const data = normalize(input);
       await checkCategory(userId, data);

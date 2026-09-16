@@ -4,6 +4,11 @@ export function createFinance({ api, toast, onUnauthorized }) {
     (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const money = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value));
   const displayDate = (value) => value ? value.split('-').reverse().join('/') : '';
+  const displayMonth = (value) => {
+    const [year, month] = value.split('-').map(Number);
+    return new Intl.DateTimeFormat('pt-BR', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+      .format(new Date(Date.UTC(year, month - 1, 1))).replace(' de ', ' ');
+  };
   const localDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   let categories = [];
   let movements = [];
@@ -86,6 +91,38 @@ export function createFinance({ api, toast, onUnauthorized }) {
     $('#movement-next').disabled = page >= totalPages;
   }
 
+  function renderCharts(result) {
+    const categoryMax = Math.max(0, ...result.categorias.map((item) => Number(item.total)));
+    $('#category-chart-empty').classList.toggle('hidden', result.categorias.length > 0);
+    $('#category-chart').innerHTML = result.categorias.map((item) => {
+      const percent = categoryMax ? (Number(item.total) / categoryMax) * 100 : 0;
+      const type = item.tipo === 'INGRESO' ? 'income' : 'expense';
+      const typeLabel = item.tipo === 'INGRESO' ? 'Receita' : 'Despesa';
+      return `<div class="category-bar-item" role="listitem" aria-label="${escape(item.categoria)}: ${escape(money(item.total))}, ${typeLabel}">
+        <div class="category-bar-label"><span>${escape(item.categoria)}</span><strong>${escape(money(item.total))}</strong></div>
+        <div class="category-bar-track" aria-hidden="true"><span class="${type}" style="width:${percent.toFixed(2)}%"></span></div>
+        <small>${typeLabel} · ${item.cantidad} lançamento(s)</small>
+      </div>`;
+    }).join('');
+
+    const periodMax = Math.max(0, ...result.periodos.flatMap((item) =>
+      [Number(item.total_ingresos), Number(item.total_gastos)]));
+    $('#period-chart-empty').classList.toggle('hidden', result.periodos.length > 0);
+    $('#period-chart').innerHTML = result.periodos.map((item) => {
+      const income = Number(item.total_ingresos);
+      const expense = Number(item.total_gastos);
+      const incomeHeight = periodMax ? Math.max(income > 0 ? 2 : 0, (income / periodMax) * 100) : 0;
+      const expenseHeight = periodMax ? Math.max(expense > 0 ? 2 : 0, (expense / periodMax) * 100) : 0;
+      return `<div class="period-group" role="listitem" aria-label="${escape(displayMonth(item.periodo))}: receitas ${escape(money(income))}, despesas ${escape(money(expense))}, saldo ${escape(money(item.saldo))}">
+        <div class="period-bars" aria-hidden="true">
+          <span class="period-bar income" style="height:${incomeHeight.toFixed(2)}%" title="Receitas: ${escape(money(income))}"></span>
+          <span class="period-bar expense" style="height:${expenseHeight.toFixed(2)}%" title="Despesas: ${escape(money(expense))}"></span>
+        </div>
+        <strong>${escape(displayMonth(item.periodo))}</strong><small>Saldo ${escape(money(item.saldo))}</small>
+      </div>`;
+    }).join('');
+  }
+
   async function refresh() {
     const version = ++requestVersion;
     const session = epoch;
@@ -96,19 +133,27 @@ export function createFinance({ api, toast, onUnauthorized }) {
     try {
       const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
       query.set('pagina', String(page));
-      const result = await api(`/api/movimientos?${query}`);
+      const [result, charts] = await Promise.all([
+        api(`/api/movimientos?${query}`),
+        api(`/api/movimientos/graficos?${query}`),
+      ]);
       if (version !== requestVersion || session !== epoch) return;
       if (page > result.paginacion.total_paginas) {
         page = result.paginacion.total_paginas;
         return await refresh();
       }
       render(result);
+      renderCharts(charts);
       $('#movement-results').classList.remove('hidden');
     } catch (error) {
       if (version !== requestVersion || session !== epoch) return;
       if (error.status === 401) { onUnauthorized(); toast('Sua sessão expirou. Entre novamente.'); return; }
       $('#movement-list-error').textContent = error.message;
       $('#dashboard-context').textContent = 'Não foi possível carregar os totais. Tente novamente em Movimentações.';
+      $('#category-chart').replaceChildren();
+      $('#period-chart').replaceChildren();
+      $('#category-chart-empty').classList.remove('hidden');
+      $('#period-chart-empty').classList.remove('hidden');
       for (const id of ['total-income', 'total-expense', 'total-balance']) $(`#${id}`).textContent = '—';
     } finally {
       if (version === requestVersion && session === epoch) $('#movement-loading').classList.add('hidden');
@@ -228,6 +273,8 @@ export function createFinance({ api, toast, onUnauthorized }) {
       movements = []; categories = []; editing = null; pendingDelete = null;
       $('#movement-rows').replaceChildren();
       $('#movement-results').classList.add('hidden');
+      $('#category-chart').replaceChildren();
+      $('#period-chart').replaceChildren();
       $('#movement-delete-dialog').close();
       resetForm();
       for (const id of ['total-income', 'total-expense', 'total-balance']) $(`#${id}`).textContent = '—';

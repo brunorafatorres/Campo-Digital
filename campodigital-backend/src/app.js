@@ -54,13 +54,16 @@ export function createApp(overrides = {}) {
   });
 
   app.use((error, _request, response, _next) => {
+    const outdatedSchema = ['ER_BAD_FIELD_ERROR', 'ER_NO_SUCH_TABLE'].includes(error.code);
     if (!error.status || error.status >= 500) {
       console.error(error);
     }
 
-    response.status(error.status ?? 500).json({
+    response.status(outdatedSchema ? 503 : (error.status ?? 500)).json({
       status: 'error',
-      message: error.status ? error.message : 'Error interno del servidor.',
+      message: outdatedSchema
+        ? 'Banco de dados desatualizado. Execute npm run db:migrate e reinicie o servidor.'
+        : (error.status ? error.message : 'Erro interno do servidor.'),
     });
   });
 

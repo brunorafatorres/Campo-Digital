@@ -13,7 +13,8 @@ API inicial del MVP de gestión financiera para productores rurales.
 2. Copia `.env.example` como `.env` y usa en `DB_PASSWORD` la misma contraseña del paso anterior.
 3. Instala las dependencias con `npm install`.
 4. Ejecuta `npm run db:migrate` para crear las tablas esenciales.
-5. Inicia el servidor con `npm run dev`.
+5. Ejecuta `npm run db:check` para confirmar que las tablas possuem as colunas esperadas.
+6. Inicia el servidor con `npm run dev`.
 
 El usuario `campodigital` queda limitado a la base del proyecto. No uses la cuenta `root` para ejecutar normalmente la API.
 
@@ -30,6 +31,7 @@ El usuario `campodigital` queda limitado a la base del proyecto. No uses la cuen
 - `GET /api/categorias`: lista categorías del sistema y propias.
 - `POST /api/categorias`: crea una categoría propia.
 - `PATCH /api/categorias/:id/desactivar`: desactiva una categoría propia.
+- `GET /api/movimientos/graficos`: agrupa os valores por categoria e por mês.
 
 ## Frontend
 
@@ -54,7 +56,7 @@ Guarda el `accessToken` de la respuesta para las rutas protegidas. La contraseñ
 
 ## Alcance actual
 
-Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales, autenticación por token, perfil productivo, categorías y un frontend responsivo. También incluye registro, edición, eliminación y consulta de movimientos financieros con totales por período.
+Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales, autenticación por token, perfil productivo, categorías y un frontend responsivo. También incluye registro, edición, eliminación y consulta de movimientos financieros com totais e gráficos por período.
 
 ## Movimentações financeiras (RF03 a RF07)
 
@@ -64,6 +66,7 @@ Todas as rotas abaixo exigem `Authorization: Bearer <token>`. O produtor é iden
 |---|---|---|
 | GET | `/api/movimientos` | Movimentações, resumo e paginação |
 | GET | `/api/movimientos/resumen` | Receitas, despesas, saldo e quantidade |
+| GET | `/api/movimientos/graficos` | Totais agrupados por categoria e por mês |
 | POST | `/api/movimientos` | Cadastra uma receita ou despesa |
 | PUT | `/api/movimientos/:id` | Substitui os campos financeiros de um lançamento próprio |
 | DELETE | `/api/movimientos/:id` | Exclui um lançamento próprio e responde com 204 |
@@ -101,6 +104,18 @@ Os filtros são opcionais, combináveis e incluem ambas as datas. Sem período, 
 
 Este módulo usa a tabela `movimientos_financieros` já existente em `migrations/001_core.sql`, com as categorias `es_sistema`/`activa`. Não há nova migração nesta etapa. Em uma instalação nova, execute `npm run db:migrate`; uma base criada com outra versão do SQL deve ser conferida antes de usar o módulo.
 
+A migração também adapta, sem apagar registros, o esquema produzido na primeira etapa do TCC, no qual as categorias utilizavam os nomes `es_global` e `activo`. Se a interface mostrar “Erro interno del servidor” nas telas de produção, categorias e movimentações, pare o servidor, execute `npm run db:migrate` e depois `npm run db:check`.
+
+## Tecnologias definidas no TCC
+
+- Apresentação: HTML, CSS e JavaScript.
+- Aplicação: Node.js 22 com Express 5.
+- Persistência: MySQL 8.0.16 ou superior, acessado com `mysql2`.
+- Inteligência Artificial: serviço auxiliar em Python com TensorFlow.
+- Versionamento: Git e GitHub.
+
+O serviço de IA será independente do funcionamento financeiro básico. Se ele estiver indisponível, autenticação, categorias, atividades e movimentações continuarão funcionando.
+
 ### Validação
 
 ```bash
@@ -109,8 +124,8 @@ npm test
 node --test test/movements.test.js
 ```
 
-A suíte contém 29 testes: 14 anteriores e 15 para movimentações. Os novos testes exercitam as rotas Express, os tokens e os serviços reais, utilizando um repositório de dados em memória (`test-support/movement-fixture.js`). Cobrem validações, permissões, categorias inativas, filtros, paginação e recálculo. **Não executam consultas em um servidor MySQL.**
+A suíte contém 31 testes: 14 anteriores e 17 para movimentações e gráficos. Os novos testes exercitam as rotas Express, os tokens e os serviços reais, utilizando um repositório de dados em memória (`test-support/movement-fixture.js`). Cobrem validações, permissões, categorias inativas, filtros, paginação, recálculo e agrupamentos por categoria e mês. **Não executam consultas em um servidor MySQL.**
 
 Para conferir com seu banco local: registre uma receita de R$ 150,50 e uma despesa de R$ 58,25 no mesmo período. O saldo deve ser R$ 92,25. Edite a receita para R$ 200,10 (saldo R$ 141,85), aplique os filtros e exclua a despesa (saldo R$ 200,10). Atualize a página para conferir a persistência e use uma segunda conta para verificar que ela não vê os lançamentos da primeira.
 
-A interface possui estados de carregamento/erro, confirmação antes da exclusão e suporte a telas pequenas. Gráficos e recursos de IA permanecem como etapas futuras.
+A interface possui estados de carregamento/erro, confirmação antes da exclusão, gráficos financeiros acessíveis e suporte a telas pequenas. Os recursos de IA permanecem como etapas futuras.

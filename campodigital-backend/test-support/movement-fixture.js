@@ -55,6 +55,34 @@ export function createMovementFixture() {
       }
       return { cantidad: items.length, total_ingresos: amount(income), total_gastos: amount(expense), saldo: amount(income - expense) };
     },
+    async summarizeByCategory(userId, filters) {
+      const grouped = new Map();
+      for (const row of select(userId, filters)) {
+        const key = `${row.categoria_id}:${row.tipo}`;
+        const current = grouped.get(key) ?? { categoria_id: row.categoria_id,
+          categoria: visible(userId, row.categoria_id).nombre, tipo: row.tipo, cantidad: 0, cents: 0n };
+        current.cantidad++;
+        current.cents += BigInt(row.valor.replace('.', ''));
+        grouped.set(key, current);
+      }
+      return [...grouped.values()].sort((a, b) => (a.cents === b.cents
+        ? a.categoria.localeCompare(b.categoria) : (a.cents > b.cents ? -1 : 1)))
+        .map(({ cents, ...item }) => ({ ...item, total: amount(cents) }));
+    },
+    async summarizeByMonth(userId, filters) {
+      const grouped = new Map();
+      for (const row of select(userId, filters)) {
+        const key = row.fecha.slice(0, 7);
+        const current = grouped.get(key) ?? { periodo: key, income: 0n, expense: 0n };
+        if (row.tipo === 'INGRESO') current.income += BigInt(row.valor.replace('.', ''));
+        else current.expense += BigInt(row.valor.replace('.', ''));
+        grouped.set(key, current);
+      }
+      return [...grouped.values()].sort((a, b) => a.periodo.localeCompare(b.periodo)).map((item) => ({
+        periodo: item.periodo, total_ingresos: amount(item.income), total_gastos: amount(item.expense),
+        saldo: amount(item.income - item.expense),
+      }));
+    },
   };
   return { repository, categories, rows };
 }

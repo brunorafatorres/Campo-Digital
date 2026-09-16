@@ -12,6 +12,10 @@ export function createMovementRouter(service, requireAuth) {
     response.json({ resumen: await service.summarize(request.auth.sub, request.query) });
   });
 
+  router.get('/graficos', async (request, response) => {
+    response.json(await service.charts(request.auth.sub, request.query));
+  });
+
   router.post('/', async (request, response) => {
     response.status(201).json({ movimiento: await service.create(request.auth.sub, request.body) });
   });

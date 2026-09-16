@@ -35,10 +35,40 @@ async function request(path = '', method = 'GET', body) {
 const create = (changes = {}) => request('', 'POST', { ...input, ...changes });
 
 test('movimentações: todas as operações exigem autenticação', async () => {
-  for (const [path, method] of [['', 'GET'], ['/resumen', 'GET'], ['', 'POST'], ['/1', 'PUT'], ['/1', 'DELETE']]) {
+  for (const [path, method] of [['', 'GET'], ['/resumen', 'GET'], ['/graficos', 'GET'], ['', 'POST'], ['/1', 'PUT'], ['/1', 'DELETE']]) {
     assert.equal((await fetch(base + path, { method })).status, 401);
   }
   assert.equal(fixture.rows.length, 0);
+});
+
+test('gráficos: agrupa valores por categoria e por mês', async () => {
+  await create({ fecha: '2026-08-20', valor: '100.00' });
+  await create({ fecha: '2026-09-10', valor: '250.50' });
+  await create({ fecha: '2026-09-11', tipo: 'GASTO', categoria_id: 2, valor: '80.25' });
+  const result = await request('/graficos');
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body.categorias, [
+    { categoria_id: 1, categoria: 'Venda de produção', tipo: 'INGRESO', cantidad: 2, total: '350.50' },
+    { categoria_id: 2, categoria: 'Ração', tipo: 'GASTO', cantidad: 1, total: '80.25' },
+  ]);
+  assert.deepEqual(result.body.periodos, [
+    { periodo: '2026-08', total_ingresos: '100.00', total_gastos: '0.00', saldo: '100.00' },
+    { periodo: '2026-09', total_ingresos: '250.50', total_gastos: '80.25', saldo: '170.25' },
+  ]);
+});
+
+test('gráficos: respeita período, tipo, categoria e isolamento do produtor', async () => {
+  await create({ fecha: '2026-09-10', valor: '40.00' });
+  await create({ fecha: '2026-09-11', tipo: 'GASTO', categoria_id: 2, valor: '15.00' });
+  await create({ fecha: '2026-10-01', tipo: 'GASTO', categoria_id: 2, valor: '20.00' });
+  await fixture.repository.create('8', { ...input, valor: '999.00' });
+  const result = await request('/graficos?desde=2026-09-01&hasta=2026-09-30&tipo=GASTO&categoria_id=2');
+  assert.deepEqual(result.body.categorias, [
+    { categoria_id: 2, categoria: 'Ração', tipo: 'GASTO', cantidad: 1, total: '15.00' },
+  ]);
+  assert.deepEqual(result.body.periodos, [
+    { periodo: '2026-09', total_ingresos: '0.00', total_gastos: '15.00', saldo: '-15.00' },
+  ]);
 });
 
 test('movimentações: cadastro usa o produtor do token e preserva centavos', async () => {

@@ -144,6 +144,7 @@ button { cursor: pointer; }
   .topbar { justify-content: flex-start; gap: 18px; }
   .user-chip { margin-left: auto; }
   .summary-grid, .dashboard-grid, .form-layout { grid-template-columns: 1fr; }
+  .finance-charts { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
@@ -229,9 +230,37 @@ button:focus-visible { outline: 2px solid var(--forest-2); outline-offset: 3px; 
 .danger-button { border: 0; border-radius: 10px; padding: 12px 18px; color: white; background: var(--danger); font-weight: 700; }
 #period-label { white-space: normal; text-align: right; }
 .summary-card strong { overflow-wrap: anywhere; }
+
+/* Gráficos financeiros */
+.finance-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.chart-card { min-width: 0; padding: 26px; }
+.chart-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+.chart-heading .eyebrow { margin-bottom: 5px; }
+.chart-legend { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+.chart-legend i { width: 9px; height: 9px; border-radius: 3px; }
+.chart-legend i.income, .category-bar-track .income, .period-bar.income { background: #65a77d; }
+.chart-legend i.expense, .category-bar-track .expense, .period-bar.expense { background: #d78d79; }
+.category-chart { display: grid; gap: 18px; max-height: 340px; overflow-y: auto; padding-right: 5px; }
+.category-bar-item { display: grid; gap: 7px; }
+.category-bar-label { display: flex; justify-content: space-between; gap: 14px; font-size: 13px; }
+.category-bar-label span { overflow-wrap: anywhere; }
+.category-bar-label strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.category-bar-track { overflow: hidden; height: 10px; border-radius: 999px; background: #edf1ed; }
+.category-bar-track span { display: block; min-width: 2px; height: 100%; border-radius: inherit; }
+.category-bar-item small, .period-group small { color: var(--muted); font-size: 11px; }
+.period-chart { display: flex; align-items: stretch; gap: 20px; min-height: 245px; overflow-x: auto; padding: 5px 4px 8px; border-bottom: 1px solid var(--line); }
+.period-group { display: grid; flex: 1 0 82px; grid-template-rows: 174px auto auto; gap: 6px; min-width: 82px; text-align: center; }
+.period-bars { display: flex; align-items: flex-end; justify-content: center; gap: 7px; height: 174px; border-bottom: 1px solid #cbd5ce; background: repeating-linear-gradient(to top, transparent 0, transparent 42px, #edf1ed 43px); }
+.period-bar { width: 21px; min-height: 0; border-radius: 6px 6px 2px 2px; transition: height .25s ease; }
+.period-group strong { font-size: 12px; text-transform: capitalize; }
+.period-group small { line-height: 1.35; }
 @media (max-width: 620px) {
   .movement-form-grid, .filter-grid { grid-template-columns: 1fr; }
   .movement-filters { padding: 20px; }
   .button-row > button { flex: 1 1 auto; }
   .movement-table th, .movement-table td { padding: 12px; }
+  .finance-charts { grid-template-columns: 1fr; }
+  .chart-card { padding: 20px; }
+  .chart-heading { display: grid; }
+  .chart-legend { justify-content: flex-start; }
 }

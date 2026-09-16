@@ -47,6 +47,38 @@ export function createMovementRepository(database) {
       return rows[0];
     },
 
+    async summarizeByCategory(userId, filters) {
+      const clause = where(userId, filters);
+      const [rows] = await database.execute(
+        `SELECT m.categoria_id, c.nombre AS categoria, m.tipo,
+                COUNT(*) AS cantidad,
+                CAST(SUM(m.valor) AS CHAR) AS total
+           FROM movimientos_financieros m
+           JOIN categorias_financieras c ON c.id = m.categoria_id
+          WHERE ${clause.sql}
+          GROUP BY m.categoria_id, c.nombre, m.tipo
+          ORDER BY SUM(m.valor) DESC, c.nombre ASC`,
+        clause.params,
+      );
+      return rows;
+    },
+
+    async summarizeByMonth(userId, filters) {
+      const clause = where(userId, filters);
+      const [rows] = await database.execute(
+        `SELECT DATE_FORMAT(m.fecha, '%Y-%m') AS periodo,
+                CAST(COALESCE(SUM(CASE WHEN m.tipo = 'INGRESO' THEN m.valor ELSE 0 END), 0) AS CHAR) AS total_ingresos,
+                CAST(COALESCE(SUM(CASE WHEN m.tipo = 'GASTO' THEN m.valor ELSE 0 END), 0) AS CHAR) AS total_gastos,
+                CAST(COALESCE(SUM(CASE WHEN m.tipo = 'INGRESO' THEN m.valor ELSE -m.valor END), 0) AS CHAR) AS saldo
+           FROM movimientos_financieros m
+          WHERE ${clause.sql}
+          GROUP BY DATE_FORMAT(m.fecha, '%Y-%m')
+          ORDER BY periodo ASC`,
+        clause.params,
+      );
+      return rows;
+    },
+
     async findOwned(userId, id) {
       const [rows] = await database.execute(
         `SELECT ${COLUMNS}

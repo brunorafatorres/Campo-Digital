@@ -82,11 +82,107 @@ CREATE TABLE IF NOT EXISTS movimientos_financieros (
     ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
-INSERT IGNORE INTO categorias_financieras (usuario_id, nombre, tipo, es_sistema)
-VALUES
-  (NULL, 'Venta de producción', 'INGRESO', TRUE),
-  (NULL, 'Otros ingresos', 'INGRESO', TRUE),
-  (NULL, 'Insumos', 'GASTO', TRUE),
-  (NULL, 'Transporte', 'GASTO', TRUE),
-  (NULL, 'Mano de obra', 'GASTO', TRUE),
-  (NULL, 'Otros gastos', 'GASTO', TRUE);
+-- Compatibilidade com o esquema elaborado na primeira etapa do TCC.
+-- CREATE TABLE IF NOT EXISTS não altera tabelas que já existiam. Por isso,
+-- instalações anteriores podem possuir activo/es_global e não possuir as
+-- colunas activa/es_sistema usadas pela aplicação atual.
+SET @schema_name = DATABASE();
+
+SET @has_activity_active = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'actividades_productivas'
+     AND COLUMN_NAME = 'activa'
+);
+SET @sql = IF(
+  @has_activity_active = 0,
+  'ALTER TABLE actividades_productivas ADD COLUMN activa BOOLEAN NOT NULL DEFAULT TRUE AFTER descripcion',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_system_flag = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'categorias_financieras'
+     AND COLUMN_NAME = 'es_sistema'
+);
+SET @sql = IF(
+  @has_system_flag = 0,
+  'ALTER TABLE categorias_financieras ADD COLUMN es_sistema BOOLEAN NOT NULL DEFAULT FALSE AFTER tipo',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_category_active = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'categorias_financieras'
+     AND COLUMN_NAME = 'activa'
+);
+SET @sql = IF(
+  @has_category_active = 0,
+  'ALTER TABLE categorias_financieras ADD COLUMN activa BOOLEAN NOT NULL DEFAULT TRUE AFTER es_sistema',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_legacy_global = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'categorias_financieras'
+     AND COLUMN_NAME = 'es_global'
+);
+SET @sql = IF(
+  @has_legacy_global > 0,
+  'UPDATE categorias_financieras SET es_sistema = es_global',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_legacy_active = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'categorias_financieras'
+     AND COLUMN_NAME = 'activo'
+);
+SET @sql = IF(
+  @has_legacy_active > 0,
+  'UPDATE categorias_financieras SET activa = activo',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @seed_sql = IF(
+  @has_legacy_global > 0,
+  'INSERT IGNORE INTO categorias_financieras (usuario_id, nombre, tipo, es_sistema, es_global) VALUES
+    (NULL, ''Venda de producao'', ''INGRESO'', TRUE, TRUE),
+    (NULL, ''Outras receitas'', ''INGRESO'', TRUE, TRUE),
+    (NULL, ''Sementes e mudas'', ''GASTO'', TRUE, TRUE),
+    (NULL, ''Racao e alimentacao animal'', ''GASTO'', TRUE, TRUE),
+    (NULL, ''Combustivel'', ''GASTO'', TRUE, TRUE),
+    (NULL, ''Fertilizantes e insumos'', ''GASTO'', TRUE, TRUE),
+    (NULL, ''Manutencao de equipamentos'', ''GASTO'', TRUE, TRUE),
+    (NULL, ''Transporte'', ''GASTO'', TRUE, TRUE),
+    (NULL, ''Outros gastos'', ''GASTO'', TRUE, TRUE)',
+  'INSERT IGNORE INTO categorias_financieras (usuario_id, nombre, tipo, es_sistema) VALUES
+    (NULL, ''Venta de producción'', ''INGRESO'', TRUE),
+    (NULL, ''Otros ingresos'', ''INGRESO'', TRUE),
+    (NULL, ''Insumos'', ''GASTO'', TRUE),
+    (NULL, ''Transporte'', ''GASTO'', TRUE),
+    (NULL, ''Mano de obra'', ''GASTO'', TRUE),
+    (NULL, ''Otros gastos'', ''GASTO'', TRUE)'
+);
+PREPARE migration_statement FROM @seed_sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
