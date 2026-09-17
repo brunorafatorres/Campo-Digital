@@ -1,6 +1,9 @@
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 
+import { createCategorySuggestionClient } from './ai/category-suggestion.client.js';
+import { createCategorySuggestionRouter } from './ai/category-suggestion.routes.js';
+import { createCategorySuggestionService } from './ai/category-suggestion.service.js';
 import { createActivityRepository } from './activities/activity.repository.js';
 import { createActivityRouter } from './activities/activity.routes.js';
 import { createActivityService } from './activities/activity.service.js';
@@ -31,6 +34,9 @@ export function createApp(overrides = {}) {
     ?? createActivityService(createActivityRepository(pool));
   const categoryService = overrides.categoryService
     ?? createCategoryService(createCategoryRepository(pool));
+  const aiClient = overrides.aiClient ?? createCategorySuggestionClient(env.ai);
+  const categorySuggestionService = overrides.categorySuggestionService
+    ?? createCategorySuggestionService(categoryService, aiClient);
   const movementService = overrides.movementService
     ?? createMovementService(createMovementRepository(pool));
 
@@ -41,6 +47,7 @@ export function createApp(overrides = {}) {
   app.use('/api/auth', createAuthRouter(authService, requireAuth));
   app.use('/api/actividades', createActivityRouter(activityService, requireAuth));
   app.use('/api/categorias', createCategoryRouter(categoryService, requireAuth));
+  app.use('/api/ia', createCategorySuggestionRouter(categorySuggestionService, requireAuth));
   app.use('/api/movimientos', createMovementRouter(movementService, requireAuth));
 
   const publicDirectory = fileURLToPath(new URL('../public', import.meta.url));

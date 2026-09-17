@@ -1,0 +1,52 @@
+tipo,categoria_chave,descricao
+INGRESO,VENDA_PRODUCAO,venda de leite da semana
+INGRESO,VENDA_PRODUCAO,venda de gado
+INGRESO,VENDA_PRODUCAO,recebimento pela produção de soja
+INGRESO,VENDA_PRODUCAO,pagamento da venda de ovos
+INGRESO,VENDA_PRODUCAO,venda de hortaliças na feira
+INGRESO,VENDA_PRODUCAO,receita da produção de milho
+INGRESO,OUTROS_INGRESSOS,recebimento de aluguel
+INGRESO,OUTROS_INGRESSOS,entrada de valor diverso
+INGRESO,OUTROS_INGRESSOS,reembolso recebido
+INGRESO,OUTROS_INGRESSOS,juros recebidos
+INGRESO,OUTROS_INGRESSOS,outra receita da propriedade
+GASTO,SEMENTES_MUDAS,compra de sementes de milho
+GASTO,SEMENTES_MUDAS,mudas para o pomar
+GASTO,SEMENTES_MUDAS,sementes para plantio
+GASTO,SEMENTES_MUDAS,compra de mudas de tomate
+GASTO,SEMENTES_MUDAS,sementes de pastagem
+GASTO,RACAO,ração para o gado
+GASTO,RACAO,alimentação dos animais
+GASTO,RACAO,compra de ração para galinhas
+GASTO,RACAO,sal mineral para bovinos
+GASTO,RACAO,alimento para os porcos
+GASTO,COMBUSTIVEL,abastecimento do trator
+GASTO,COMBUSTIVEL,compra de diesel
+GASTO,COMBUSTIVEL,gasolina da caminhonete
+GASTO,COMBUSTIVEL,combustível para máquinas
+GASTO,COMBUSTIVEL,óleo diesel da colheitadeira
+GASTO,INSUMOS,compra de fertilizante
+GASTO,INSUMOS,adubo para a lavoura
+GASTO,INSUMOS,defensivos agrícolas
+GASTO,INSUMOS,insumos para produção
+GASTO,INSUMOS,compra de calcário
+GASTO,MANUTENCAO,conserto do trator
+GASTO,MANUTENCAO,manutenção da ordenhadeira
+GASTO,MANUTENCAO,peças para equipamento
+GASTO,MANUTENCAO,reparo da colheitadeira
+GASTO,MANUTENCAO,oficina da máquina agrícola
+GASTO,TRANSPORTE,frete da produção
+GASTO,TRANSPORTE,transporte até a feira
+GASTO,TRANSPORTE,pagamento do caminhão
+GASTO,TRANSPORTE,entrega dos produtos
+GASTO,TRANSPORTE,frete dos insumos
+GASTO,MAO_OBRA,pagamento de funcionário
+GASTO,MAO_OBRA,diária do trabalhador
+GASTO,MAO_OBRA,salário do empregado rural
+GASTO,MAO_OBRA,mão de obra da colheita
+GASTO,MAO_OBRA,pagamento do peão
+GASTO,OUTROS_GASTOS,despesa diversa
+GASTO,OUTROS_GASTOS,outro gasto da propriedade
+GASTO,OUTROS_GASTOS,pagamento não classificado
+GASTO,OUTROS_GASTOS,compra eventual
+GASTO,OUTROS_GASTOS,gasto geral

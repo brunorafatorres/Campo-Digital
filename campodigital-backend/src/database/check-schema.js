@@ -6,7 +6,8 @@ const required = {
   usuarios: ['id', 'nombre', 'email', 'password_hash', 'rol', 'activo'],
   actividades_productivas: ['id', 'usuario_id', 'nombre', 'descripcion', 'activa'],
   categorias_financieras: ['id', 'usuario_id', 'nombre', 'tipo', 'es_sistema', 'activa'],
-  movimientos_financieros: ['id', 'usuario_id', 'categoria_id', 'tipo', 'descripcion', 'valor', 'fecha'],
+  movimientos_financieros: ['id', 'usuario_id', 'categoria_id', 'categoria_sugerida_id',
+    'confianza_ia', 'tipo', 'descripcion', 'valor', 'fecha'],
 };
 
 const connection = await mysql.createConnection({

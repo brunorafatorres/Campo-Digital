@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS movimientos_financieros (
   valor DECIMAL(15, 2) NOT NULL,
   fecha DATE NOT NULL,
   descripcion VARCHAR(500) NULL,
+  categoria_sugerida_id BIGINT UNSIGNED NULL,
+  confianza_ia DECIMAL(5, 2) NULL,
   creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -79,7 +81,13 @@ CREATE TABLE IF NOT EXISTS movimientos_financieros (
   CONSTRAINT fk_movimientos_categoria
     FOREIGN KEY (categoria_id) REFERENCES categorias_financieras (id)
     ON UPDATE RESTRICT
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+  CONSTRAINT fk_movimientos_categoria_sugerida
+    FOREIGN KEY (categoria_sugerida_id) REFERENCES categorias_financieras (id)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL,
+  CONSTRAINT ck_movimientos_confianza_ia
+    CHECK (confianza_ia IS NULL OR confianza_ia BETWEEN 0 AND 100)
 ) ENGINE = InnoDB;
 
 -- Compatibilidade com o esquema elaborado na primeira etapa do TCC.
@@ -157,6 +165,36 @@ SET @has_legacy_active = (
 SET @sql = IF(
   @has_legacy_active > 0,
   'UPDATE categorias_financieras SET activa = activo',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_suggested_category = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'movimientos_financieros'
+     AND COLUMN_NAME = 'categoria_sugerida_id'
+);
+SET @sql = IF(
+  @has_suggested_category = 0,
+  'ALTER TABLE movimientos_financieros ADD COLUMN categoria_sugerida_id BIGINT UNSIGNED NULL AFTER fecha',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_ai_confidence = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'movimientos_financieros'
+     AND COLUMN_NAME = 'confianza_ia'
+);
+SET @sql = IF(
+  @has_ai_confidence = 0,
+  'ALTER TABLE movimientos_financieros ADD COLUMN confianza_ia DECIMAL(5,2) NULL AFTER categoria_sugerida_id',
   'SELECT 1'
 );
 PREPARE migration_statement FROM @sql;

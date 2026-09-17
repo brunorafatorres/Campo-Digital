@@ -17,6 +17,7 @@ export function createFinance({ api, toast, onUnauthorized }) {
   let totalPages = 1;
   let editing = null;
   let pendingDelete = null;
+  let aiSuggestion = null;
   let epoch = 0;
   let requestVersion = 0;
 
@@ -52,7 +53,48 @@ export function createFinance({ api, toast, onUnauthorized }) {
     $('#movement-cancel').disabled = false;
     $('#movement-cancel').classList.add('hidden');
     $('#movement-error').textContent = '';
+    clearSuggestion();
     categoryOptions();
+  }
+
+  function clearSuggestion(message = 'A sugestão é opcional e pode ser alterada antes de salvar.') {
+    aiSuggestion = null;
+    const status = $('#movement-ai-status');
+    status.textContent = message;
+    status.className = '';
+  }
+
+  async function suggestCategory() {
+    const button = $('#movement-suggest-category');
+    const status = $('#movement-ai-status');
+    button.disabled = true;
+    status.className = '';
+    status.textContent = 'Analisando a descrição…';
+    try {
+      const result = await api('/api/ia/sugerir-categoria', {
+        method: 'POST',
+        body: JSON.stringify({
+          descripcion: $('#movement-description').value,
+          tipo: $('#movement-type').value,
+        }),
+      });
+      const option = [...$('#movement-category').options]
+        .find((item) => item.value === String(result.categoria.id));
+      if (!option) throw new Error('A categoria sugerida não está disponível no formulário.');
+      $('#movement-category').value = String(result.categoria.id);
+      aiSuggestion = {
+        categoria_sugerida_id: result.categoria.id,
+        confianza_ia: result.confianca,
+      };
+      status.className = 'ai-success';
+      status.textContent = `IA sugeriu “${result.categoria.nombre}” (${Number(result.confianca).toFixed(1)}%). Você pode alterar antes de salvar.`;
+    } catch (error) {
+      aiSuggestion = null;
+      status.className = 'ai-error';
+      status.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
   }
 
   function readFilters() {
@@ -173,7 +215,7 @@ export function createFinance({ api, toast, onUnauthorized }) {
         method: id ? 'PUT' : 'POST',
         body: JSON.stringify({ tipo: $('#movement-type').value, categoria_id: $('#movement-category').value,
           descripcion: $('#movement-description').value, valor: $('#movement-value').value,
-          fecha: $('#movement-date').value }),
+          fecha: $('#movement-date').value, ...(aiSuggestion ?? {}) }),
       });
       if (session !== epoch) return;
       resetForm();
@@ -192,8 +234,17 @@ export function createFinance({ api, toast, onUnauthorized }) {
   }
 
   $('#movement-form').addEventListener('submit', save);
+  $('#movement-suggest-category').addEventListener('click', suggestCategory);
   $('#movement-cancel').addEventListener('click', resetForm);
-  $('#movement-type').addEventListener('change', categoryOptions);
+  $('#movement-type').addEventListener('change', () => { clearSuggestion(); categoryOptions(); });
+  $('#movement-description').addEventListener('input', () => {
+    if (aiSuggestion) clearSuggestion('Descrição alterada. Solicite uma nova sugestão se desejar.');
+  });
+  $('#movement-category').addEventListener('change', () => {
+    if (aiSuggestion && String(aiSuggestion.categoria_sugerida_id) !== $('#movement-category').value) {
+      $('#movement-ai-status').textContent = 'Você alterou a categoria sugerida pela IA. A correção será registrada.';
+    }
+  });
   $('#filter-type').addEventListener('change', categoryOptions);
   $('#movement-filters').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -221,6 +272,14 @@ export function createFinance({ api, toast, onUnauthorized }) {
       $('#movement-date').value = item.fecha;
       $('#movement-value').value = item.valor;
       $('#movement-description').value = item.descripcion ?? '';
+      aiSuggestion = item.categoria_sugerida_id ? {
+        categoria_sugerida_id: item.categoria_sugerida_id,
+        confianza_ia: item.confianza_ia,
+      } : null;
+      $('#movement-ai-status').className = aiSuggestion ? 'ai-success' : '';
+      $('#movement-ai-status').textContent = aiSuggestion
+        ? `Este lançamento teve sugestão da IA (${Number(item.confianza_ia).toFixed(1)}%).`
+        : 'A sugestão é opcional e pode ser alterada antes de salvar.';
       $('#movement-form-title').textContent = 'Editar movimentação';
       $('#movement-save').textContent = 'Salvar alterações';
       $('#movement-cancel').classList.remove('hidden');

@@ -10,10 +10,12 @@ Sistema web de gestão financeira para produtores rurais, desenvolvido como TCC.
 - Receitas e despesas: cadastrar, editar, excluir e consultar.
 - Filtros por período, tipo e categoria, com paginação.
 - Totais de receitas, despesas e saldo no painel.
+- Gráficos financeiros por categoria e por mês.
+- Sugestão de categoria por um serviço auxiliar em Python e TensorFlow.
 
 ## Como executar
 
-Requisitos: Node.js 22 ou superior e MySQL 8.0.16 ou superior.
+Requisitos básicos: Node.js 22 ou superior e MySQL 8.0.16 ou superior. Para utilizar a sugestão de categorias, também é necessário Python com as dependências descritas no [serviço de IA](campodigital-ai/README.md).
 
 Configure o banco e o arquivo `.env` conforme o [guia do backend](campodigital-backend/README.md). Depois, na pasta `campodigital-backend`, execute:
 
@@ -40,4 +42,4 @@ Os testes automatizados usam dados isolados em memória. A configuração e a pe
 
 ## Próximas etapas
 
-Gráficos financeiros, categorização assistida por IA e análises do período.
+Ampliar os dados de treinamento, utilizar as correções dos produtores e implementar análises e insights financeiros.

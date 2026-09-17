@@ -1,4 +1,5 @@
-const COLUMNS = `m.id, m.categoria_id, m.tipo, m.descripcion,
+const COLUMNS = `m.id, m.categoria_id, m.categoria_sugerida_id,
+  CAST(m.confianza_ia AS CHAR) AS confianza_ia, m.tipo, m.descripcion,
   CAST(m.valor AS CHAR) AS valor, DATE_FORMAT(m.fecha, '%Y-%m-%d') AS fecha,
   c.nombre AS categoria, c.activa AS categoria_activa`;
 
@@ -103,9 +104,10 @@ export function createMovementRepository(database) {
     async create(userId, data) {
       const [result] = await database.execute(
         `INSERT INTO movimientos_financieros
-          (usuario_id, categoria_id, tipo, descripcion, valor, fecha)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [userId, data.categoria_id, data.tipo, data.descripcion, data.valor, data.fecha],
+          (usuario_id, categoria_id, categoria_sugerida_id, confianza_ia, tipo, descripcion, valor, fecha)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [userId, data.categoria_id, data.categoria_sugerida_id, data.confianza_ia,
+          data.tipo, data.descripcion, data.valor, data.fecha],
       );
       return this.findOwned(userId, result.insertId);
     },
@@ -113,9 +115,11 @@ export function createMovementRepository(database) {
     async update(userId, id, data) {
       await database.execute(
         `UPDATE movimientos_financieros
-            SET categoria_id = ?, tipo = ?, descripcion = ?, valor = ?, fecha = ?
+            SET categoria_id = ?, categoria_sugerida_id = ?, confianza_ia = ?,
+                tipo = ?, descripcion = ?, valor = ?, fecha = ?
           WHERE id = ? AND usuario_id = ?`,
-        [data.categoria_id, data.tipo, data.descripcion, data.valor, data.fecha, id, userId],
+        [data.categoria_id, data.categoria_sugerida_id, data.confianza_ia,
+          data.tipo, data.descripcion, data.valor, data.fecha, id, userId],
       );
       return this.findOwned(userId, id);
     },

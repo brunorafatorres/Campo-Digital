@@ -79,6 +79,26 @@ test('movimentações: cadastro usa o produtor do token e preserva centavos', as
   assert.equal(result.body.movimiento.fecha, '2026-09-12');
 });
 
+test('movimentações: registra sugestão da IA e permite que o produtor altere a categoria final', async () => {
+  const result = await create({ tipo: 'GASTO', categoria_id: 2,
+    categoria_sugerida_id: 3, confianza_ia: 78.456 });
+  assert.equal(result.status, 400, 'categoria sugerida inativa deve ser rejeitada');
+
+  const accepted = await create({ categoria_sugerida_id: 1, confianza_ia: '91.25' });
+  assert.equal(accepted.status, 201);
+  assert.equal(accepted.body.movimiento.categoria_sugerida_id, 1);
+  assert.equal(accepted.body.movimiento.confianza_ia, '91.25');
+});
+
+test('movimentações: rejeita metadados incompletos ou inválidos da IA', async () => {
+  for (const changes of [
+    { categoria_sugerida_id: 1 }, { confianza_ia: 50 },
+    { categoria_sugerida_id: 1, confianza_ia: -1 },
+    { categoria_sugerida_id: 1, confianza_ia: 101 },
+    { categoria_sugerida_id: 2, confianza_ia: 80 },
+  ]) assert.equal((await create(changes)).status, 400);
+});
+
 test('movimentações: registra despesa com categoria própria', async () => {
   const result = await create({ tipo: 'GASTO', categoria_id: 2, valor: '0.01' });
   assert.equal(result.status, 201);

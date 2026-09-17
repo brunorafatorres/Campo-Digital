@@ -37,6 +37,8 @@ Vite enviará automáticamente las solicitudes `/api` al backend de `localhost:3
 
 O módulo está disponível no menu Movimentações: cadastro e edição de receitas/despesas, exclusão com confirmação, filtros e paginação. Os mesmos filtros atualizam receitas, despesas e saldo da Visão geral.
 
+O formulário também oferece **Sugerir categoria com IA**. A opção chama o backend, que se comunica com o serviço Python/TensorFlow. A categoria sugerida pode ser alterada pelo produtor, e o cadastro manual permanece funcionando quando a IA está indisponível.
+
 - `finance.js`: comportamento do módulo financeiro, formulários, filtros e totais.
 - `app.js`: autenticação e integração dos módulos.
 

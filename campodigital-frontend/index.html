@@ -193,6 +193,7 @@
               <label class="field"><span>Data</span><input id="movement-date" type="date" min="1000-01-01" max="9999-12-31" required></label>
               <label class="field"><span>Categoria</span><select id="movement-category" required><option value="">Selecione uma categoria</option></select><small id="movement-category-help"></small></label>
               <label class="field movement-description-field"><span>Descrição</span><input id="movement-description" required minlength="2" maxlength="255" placeholder="Ex.: Venda de leite da semana"></label>
+              <div class="ai-suggestion-field"><button id="movement-suggest-category" class="secondary-button" type="button">Sugerir categoria com IA</button><p id="movement-ai-status" role="status" aria-live="polite">A sugestão é opcional e pode ser alterada antes de salvar.</p></div>
             </div>
             <p id="movement-error" class="form-error" role="alert"></p>
             <div class="button-row"><button id="movement-save" class="primary-button fit" type="submit">Salvar movimentação</button><button id="movement-cancel" class="secondary-button hidden" type="button">Cancelar edição</button></div>

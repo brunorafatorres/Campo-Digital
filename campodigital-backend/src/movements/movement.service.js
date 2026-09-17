@@ -37,6 +37,24 @@ function readAmount(value) {
   return `${BigInt(whole)}.${decimal.padEnd(2, '0')}`;
 }
 
+function readSuggestion(input) {
+  const hasCategory = input.categoria_sugerida_id !== undefined && input.categoria_sugerida_id !== null
+    && input.categoria_sugerida_id !== '';
+  const hasConfidence = input.confianza_ia !== undefined && input.confianza_ia !== null
+    && input.confianza_ia !== '';
+  if (!hasCategory && !hasConfidence) return { categoria_sugerida_id: null, confianza_ia: null };
+  if (!hasCategory || !hasConfidence) throw fail('A sugestão de IA está incompleta.');
+  if (!['string', 'number'].includes(typeof input.confianza_ia)) {
+    throw fail('A confiança da sugestão de IA deve estar entre 0 e 100.');
+  }
+  const confidence = Number(input.confianza_ia);
+  if (!Number.isFinite(confidence) || confidence < 0 || confidence > 100) {
+    throw fail('A confiança da sugestão de IA deve estar entre 0 e 100.');
+  }
+  return { categoria_sugerida_id: readId(input.categoria_sugerida_id, 'Categoria sugerida'),
+    confianza_ia: confidence.toFixed(2) };
+}
+
 function readFilters(query = {}) {
   const present = (value) => value !== undefined && value !== '';
   const filters = {
@@ -68,6 +86,7 @@ function normalize(input) {
     descripcion,
     valor: readAmount(input.valor),
     fecha: readDate(input.fecha),
+    ...readSuggestion(input),
   };
 }
 
@@ -80,6 +99,14 @@ export function createMovementService(repository) {
     const retained = existing && String(existing.categoria_id) === String(category.id)
       && existing.tipo === data.tipo;
     if (!category.activa && !retained) throw fail('Selecione uma categoria ativa.');
+    if (data.categoria_sugerida_id !== null) {
+      const suggested = await repository.findVisibleCategory(userId, data.categoria_sugerida_id);
+      const retainedSuggestion = existing
+        && String(existing.categoria_sugerida_id) === String(data.categoria_sugerida_id);
+      if (!suggested || suggested.tipo !== data.tipo || (!suggested.activa && !retainedSuggestion)) {
+        throw fail('A categoria sugerida pela IA não está disponível.');
+      }
+    }
   }
 
   return {

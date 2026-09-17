@@ -32,6 +32,7 @@ El usuario `campodigital` queda limitado a la base del proyecto. No uses la cuen
 - `POST /api/categorias`: crea una categoría propia.
 - `PATCH /api/categorias/:id/desactivar`: desactiva una categoría propia.
 - `GET /api/movimientos/graficos`: agrupa os valores por categoria e por mês.
+- `POST /api/ia/sugerir-categoria`: solicita uma categoria ao serviço Python/TensorFlow.
 
 ## Frontend
 
@@ -116,6 +117,12 @@ A migração também adapta, sem apagar registros, o esquema produzido na primei
 
 O serviço de IA será independente do funcionamento financeiro básico. Se ele estiver indisponível, autenticação, categorias, atividades e movimentações continuarão funcionando.
 
+## Sugestão de categorias com IA (RF10 e RF16)
+
+Prepare o serviço conforme `../campodigital-ai/README.md` e mantenha `python server.py` em execução. No formulário de movimentações, informe o tipo e a descrição e pressione **Sugerir categoria com IA**. A categoria continua editável antes de salvar.
+
+A API registra `categoria_sugerida_id` e `confianza_ia`; assim, a categoria final pode ser comparada com a sugestão para aproveitar correções em uma etapa posterior. Se o serviço estiver desligado ou exceder o tempo limite, a API responde 503 somente para a sugestão e o lançamento manual continua disponível.
+
 ### Validação
 
 ```bash
@@ -124,8 +131,8 @@ npm test
 node --test test/movements.test.js
 ```
 
-A suíte contém 31 testes: 14 anteriores e 17 para movimentações e gráficos. Os novos testes exercitam as rotas Express, os tokens e os serviços reais, utilizando um repositório de dados em memória (`test-support/movement-fixture.js`). Cobrem validações, permissões, categorias inativas, filtros, paginação, recálculo e agrupamentos por categoria e mês. **Não executam consultas em um servidor MySQL.**
+A suíte contém 36 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow.**
 
 Para conferir com seu banco local: registre uma receita de R$ 150,50 e uma despesa de R$ 58,25 no mesmo período. O saldo deve ser R$ 92,25. Edite a receita para R$ 200,10 (saldo R$ 141,85), aplique os filtros e exclua a despesa (saldo R$ 200,10). Atualize a página para conferir a persistência e use uma segunda conta para verificar que ela não vê os lançamentos da primeira.
 
-A interface possui estados de carregamento/erro, confirmação antes da exclusão, gráficos financeiros acessíveis e suporte a telas pequenas. Os recursos de IA permanecem como etapas futuras.
+A interface possui estados de carregamento/erro, confirmação antes da exclusão, gráficos financeiros acessíveis, sugestão opcional de categoria e suporte a telas pequenas.

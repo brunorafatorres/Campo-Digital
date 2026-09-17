@@ -169,6 +169,10 @@ button { cursor: pointer; }
 .movement-form-grid, .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; margin-top: 24px; }
 .movement-form-grid .field, .filter-grid .field { margin: 0; }
 .movement-description-field { grid-column: 1 / -1; }
+.ai-suggestion-field { display: flex; grid-column: 1 / -1; align-items: center; gap: 14px; }
+.ai-suggestion-field p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.ai-suggestion-field .ai-success { color: var(--forest-2); font-weight: 700; }
+.ai-suggestion-field .ai-error { color: var(--danger); }
 .movement-filters { margin-top: 24px; padding: 26px; }
 .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .secondary-button { border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; color: var(--forest); background: white; font-weight: 700; }
@@ -221,6 +225,7 @@ button:focus-visible { outline: 2px solid var(--forest-2); outline-offset: 3px; 
 .period-group small { line-height: 1.35; }
 @media (max-width: 620px) {
   .movement-form-grid, .filter-grid { grid-template-columns: 1fr; }
+  .ai-suggestion-field { align-items: stretch; flex-direction: column; }
   .movement-filters { padding: 20px; }
   .button-row > button { flex: 1 1 auto; }
   .movement-table th, .movement-table td { padding: 12px; }
