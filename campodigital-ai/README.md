@@ -5,12 +5,14 @@ Serviço auxiliar em Python e TensorFlow para sugerir categorias financeiras a p
 ## Preparação no Windows
 
 ```powershell
-py -m venv .venv
-.venv\Scripts\activate
-python -m pip install -r requirements.txt
-python train.py
-python server.py
+py -3.12 -m venv .venv312
+.venv312\Scripts\python -m pip install --upgrade pip
+.venv312\Scripts\python -m pip install -r requirements.txt
+.venv312\Scripts\python train.py
+.venv312\Scripts\python server.py
 ```
+
+Use Python 3.12 para manter compatibilidade com os pacotes do TensorFlow utilizados no projeto.
 
 O treinamento cria `model/category_model.keras` e `model/labels.json`. O serviço inicia em `http://127.0.0.1:8001`; `GET /health` confirma seu funcionamento.
 

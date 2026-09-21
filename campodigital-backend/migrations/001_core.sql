@@ -90,11 +90,82 @@ CREATE TABLE IF NOT EXISTS movimientos_financieros (
     CHECK (confianza_ia IS NULL OR confianza_ia BETWEEN 0 AND 100)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS insights_financieros (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  usuario_id BIGINT UNSIGNED NOT NULL,
+  periodo_inicio DATE NOT NULL,
+  periodo_fin DATE NOT NULL,
+  tipo ENUM('ALERTA', 'TENDENCIA', 'RECOMENDACION', 'RESUMEN') NOT NULL DEFAULT 'RESUMEN',
+  titulo VARCHAR(140) NULL,
+  mensaje TEXT NOT NULL,
+  datos_referencia JSON NULL,
+  es_sugerencia BOOLEAN NOT NULL DEFAULT TRUE,
+  foi_util BOOLEAN NULL,
+  avaliado_em TIMESTAMP NULL,
+  leido_en TIMESTAMP NULL,
+  creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_insights_usuario_periodo (usuario_id, periodo_inicio, periodo_fin),
+  KEY idx_insights_usuario_creado (usuario_id, creado_en),
+  CONSTRAINT fk_insights_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE,
+  CONSTRAINT ck_insights_periodo CHECK (periodo_fin >= periodo_inicio)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS preferencias_alertas (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  usuario_id BIGINT UNSIGNED NOT NULL,
+  alertas_activas BOOLEAN NOT NULL DEFAULT TRUE,
+  frecuencia ENUM('INMEDIATA', 'DIARIA', 'SEMANAL', 'MENSUAL') NOT NULL DEFAULT 'SEMANAL',
+  porcentaje_variacion DECIMAL(5,2) NOT NULL DEFAULT 20.00,
+  actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_preferencias_usuario (usuario_id),
+  CONSTRAINT fk_preferencias_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE,
+  CONSTRAINT ck_preferencias_variacao
+    CHECK (porcentaje_variacion > 0 AND porcentaje_variacion <= 100)
+) ENGINE = InnoDB;
+
 -- Compatibilidade com o esquema elaborado na primeira etapa do TCC.
 -- CREATE TABLE IF NOT EXISTS não altera tabelas que já existiam. Por isso,
 -- instalações anteriores podem possuir activo/es_global e não possuir as
 -- colunas activa/es_sistema usadas pela aplicação atual.
 SET @schema_name = DATABASE();
+
+SET @has_insight_rating = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'insights_financieros'
+     AND COLUMN_NAME = 'foi_util'
+);
+SET @sql = IF(
+  @has_insight_rating = 0,
+  'ALTER TABLE insights_financieros ADD COLUMN foi_util BOOLEAN NULL AFTER es_sugerencia',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_insight_rating_date = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name
+     AND TABLE_NAME = 'insights_financieros'
+     AND COLUMN_NAME = 'avaliado_em'
+);
+SET @sql = IF(
+  @has_insight_rating_date = 0,
+  'ALTER TABLE insights_financieros ADD COLUMN avaliado_em TIMESTAMP NULL AFTER foi_util',
+  'SELECT 1'
+);
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
 
 SET @has_activity_active = (
   SELECT COUNT(*) FROM information_schema.COLUMNS

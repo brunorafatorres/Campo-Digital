@@ -98,6 +98,7 @@
           <button class="nav-item" data-section="profile"><span aria-hidden="true">♧</span> Minha produção</button>
           <button class="nav-item" data-section="categories"><span aria-hidden="true">≡</span> Categorias</button>
           <button class="nav-item" type="button" data-section="movements"><span aria-hidden="true">↕</span> Movimentações</button>
+          <button class="nav-item" type="button" data-section="insights"><span aria-hidden="true">✦</span> Análises</button>
         </nav>
         <button id="logout" class="logout-button" type="button">Sair da conta</button>
       </aside>
@@ -220,6 +221,64 @@
             <nav class="pagination" aria-label="Páginas de movimentações"><button id="movement-prev" class="secondary-button" type="button">Anterior</button><span id="movement-page" aria-live="polite"></span><button id="movement-next" class="secondary-button" type="button">Próxima</button></nav>
           </div>
         </section>
+        <section id="insights-section" class="content-section hidden">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Inteligência financeira</p>
+              <h2>Análises e insights</h2>
+              <p>Escolha um período para comparar resultados e identificar pontos de atenção.</p>
+            </div>
+            <span class="ai-label">Gerado por análise automática</span>
+          </div>
+
+          <form id="alert-preferences-form" class="surface alert-preferences-form">
+            <div>
+              <h3>Preferências de alertas</h3>
+              <p>Defina quando um aumento de despesas deve ser destacado.</p>
+            </div>
+            <label class="toggle-row alert-toggle"><input id="alerts-active" type="checkbox"> Ativar alertas</label>
+            <label class="field"><span>Frequência</span><select id="alerts-frequency"><option value="INMEDIATA">A cada análise</option><option value="DIARIA">Diária</option><option value="SEMANAL">Semanal</option><option value="MENSUAL">Mensal</option></select></label>
+            <label class="field"><span>Aumento mínimo (%)</span><input id="alerts-percentage" type="number" min="0.01" max="100" step="0.01" required></label>
+            <button id="alerts-save" class="secondary-button" type="submit">Salvar preferências</button>
+            <p id="alerts-error" class="form-error" role="alert"></p>
+          </form>
+
+          <form id="insight-form" class="surface insight-form">
+            <div>
+              <h3>Nova análise financeira</h3>
+              <p>O período será comparado com o intervalo anterior de mesma duração.</p>
+            </div>
+            <label class="field"><span>Data inicial</span><input id="insight-start" type="date" min="1000-01-01" max="9999-12-31" required></label>
+            <label class="field"><span>Data final</span><input id="insight-end" type="date" min="1000-01-01" max="9999-12-31" required></label>
+            <button id="insight-generate" class="primary-button fit" type="submit">Gerar análise</button>
+            <p id="insight-error" class="form-error" role="alert"></p>
+          </form>
+
+          <article id="insight-result" class="surface insight-result hidden" aria-live="polite">
+            <div class="insight-result-heading">
+              <div><p class="eyebrow">Resultado mais recente</p><h3 id="insight-title"></h3></div>
+              <span class="ai-label">Análise automática</span>
+            </div>
+            <p id="insight-message" class="insight-message"></p>
+            <p id="insight-periods" class="insight-periods"></p>
+            <div id="insight-summary" class="insight-summary"></div>
+            <div class="insight-details-grid">
+              <section><h4>Comparação com o período anterior</h4><ul id="insight-comparisons" class="insight-list"></ul></section>
+              <section><h4>Categorias com maior impacto</h4><ul id="insight-categories" class="insight-list"></ul></section>
+            </div>
+            <section class="insight-anomalies"><h4>Movimentações fora do padrão</h4><ul id="insight-anomalies" class="insight-list"></ul></section>
+            <section class="insight-alerts"><h4>Alertas de aumento de despesas</h4><ul id="insight-alerts" class="insight-list"></ul></section>
+            <p id="insight-warning" class="insight-warning"></p>
+            <div class="insight-feedback"><span>Esta análise foi útil?</span><div><button type="button" data-insight-rating="true">Útil</button><button type="button" data-insight-rating="false">Não útil</button></div></div>
+          </article>
+
+          <section class="surface insight-history-card">
+            <div><p class="eyebrow">Histórico</p><h3>Análises anteriores</h3></div>
+            <p id="insight-history-empty" class="empty-state">Nenhuma análise foi gerada ainda.</p>
+            <div id="insight-history" class="insight-history"></div>
+          </section>
+        </section>
+
         <dialog id="movement-delete-dialog" class="confirm-dialog" aria-labelledby="movement-delete-title">
           <form method="dialog">
             <h2 id="movement-delete-title">Excluir movimentação?</h2>

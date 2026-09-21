@@ -1,4 +1,5 @@
 import { createFinance } from './finance.js';
+import { createInsights } from './insights.js';
 
 const state = {
   mode: 'login',
@@ -92,11 +93,12 @@ async function enterApp() {
   const failure = results.find((result) => result.status === 'rejected');
   if (failure) toast(failure.reason.message);
   showSection('dashboard');
-  await finance.start();
+  await Promise.all([finance.start(), insights.start()]);
 }
 
 function logout() {
   finance.reset();
+  insights.reset();
   state.activities = [];
   state.categories = [];
   renderActivities();
@@ -251,6 +253,7 @@ function togglePasswordVisibility() {
 }
 
 const finance = createFinance({ api, toast, onUnauthorized: logout });
+const insights = createInsights({ api, toast, onUnauthorized: logout });
 
 $('#login-tab').addEventListener('click', () => setMode('login'));
 $('#register-tab').addEventListener('click', () => setMode('register'));

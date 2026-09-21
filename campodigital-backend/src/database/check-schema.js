@@ -8,6 +8,10 @@ const required = {
   categorias_financieras: ['id', 'usuario_id', 'nombre', 'tipo', 'es_sistema', 'activa'],
   movimientos_financieros: ['id', 'usuario_id', 'categoria_id', 'categoria_sugerida_id',
     'confianza_ia', 'tipo', 'descripcion', 'valor', 'fecha'],
+  insights_financieros: ['id', 'usuario_id', 'periodo_inicio', 'periodo_fin', 'tipo',
+    'titulo', 'mensaje', 'datos_referencia', 'es_sugerencia', 'foi_util', 'avaliado_em', 'creado_en'],
+  preferencias_alertas: ['id', 'usuario_id', 'alertas_activas', 'frecuencia',
+    'porcentaje_variacion', 'actualizado_en'],
 };
 
 const connection = await mysql.createConnection({

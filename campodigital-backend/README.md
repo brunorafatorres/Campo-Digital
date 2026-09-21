@@ -33,6 +33,11 @@ O usuário `campodigital` fica limitado ao banco do projeto. Não utilize a cont
 - `PATCH /api/categorias/:id/desactivar`: desativa uma categoria própria.
 - `GET /api/movimientos/graficos`: agrupa os valores por categoria e por mês.
 - `POST /api/ia/sugerir-categoria`: solicita uma categoria ao serviço Python/TensorFlow.
+- `GET /api/insights`: consulta o histórico de análises financeiras do produtor.
+- `POST /api/insights/analisar`: gera e salva uma análise de um período escolhido.
+- `GET /api/insights/preferencias`: consulta as preferências de alertas do produtor.
+- `PUT /api/insights/preferencias`: atualiza frequência, ativação e percentual mínimo dos alertas.
+- `PATCH /api/insights/:id/avaliacao`: registra se uma análise foi útil ou não.
 
 ## Frontend
 
@@ -123,6 +128,21 @@ Prepare o serviço conforme `../campodigital-ai/README.md` e mantenha `python se
 
 A API registra `categoria_sugerida_id` e `confianza_ia`; assim, a categoria final pode ser comparada com a sugestão para aproveitar correções em uma etapa posterior. Se o serviço estiver desligado ou exceder o tempo limite, a API responde 503 somente para a sugestão e o lançamento manual continua disponível.
 
+## Análises e insights financeiros
+
+O menu **Análises** permite escolher um período de até 366 dias. O sistema gera um resumo em linguagem simples, compara receitas, despesas e saldo com o período anterior de mesma duração, calcula o impacto das categorias de despesas e identifica movimentações acima do padrão histórico quando existem dados suficientes. O produtor pode ativar alertas, escolher sua frequência e definir o percentual mínimo de aumento de despesas por categoria.
+
+Cada resultado é salvo em `insights_financieros` com os dados utilizados como referência. O produtor pode consultar o histórico de suas próprias análises e avaliá-las como **Útil** ou **Não útil**. Os resultados são apresentados como apoio à organização financeira e não substituem orientação contábil.
+
+Exemplo:
+
+```json
+{
+  "inicio": "2026-09-01",
+  "fim": "2026-09-30"
+}
+```
+
 ### Validação
 
 ```bash
@@ -131,7 +151,7 @@ npm test
 node --test test/movements.test.js
 ```
 
-A suíte contém 36 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow.**
+A suíte contém 47 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA, análises financeiras, alertas, preferências, avaliação dos insights, histórico e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow.**
 
 Para conferir com seu banco local: registre uma receita de R$ 150,50 e uma despesa de R$ 58,25 no mesmo período. O saldo deve ser R$ 92,25. Edite a receita para R$ 200,10 (saldo R$ 141,85), aplique os filtros e exclua a despesa (saldo R$ 200,10). Atualize a página para conferir a persistência e use uma segunda conta para verificar que ela não vê os lançamentos da primeira.
 

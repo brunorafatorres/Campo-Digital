@@ -40,7 +40,12 @@ O módulo está disponível no menu Movimentações: cadastro e edição de rece
 O formulário também oferece **Sugerir categoria com IA**. A opção chama o backend, que se comunica com o serviço Python/TensorFlow. A categoria sugerida pode ser alterada pelo produtor, e o cadastro manual permanece funcionando quando a IA está indisponível.
 
 - `finance.js`: comportamento do módulo financeiro, formulários, filtros e totais.
+- `insights.js`: geração, apresentação e histórico das análises financeiras.
 - `app.js`: autenticação e integração dos módulos.
+
+## Análises financeiras
+
+O menu **Análises** permite selecionar um período, comparar os resultados com o período anterior, visualizar categorias de maior impacto e consultar movimentações acima do padrão histórico. O produtor também configura a frequência e o percentual mínimo dos alertas de despesas e pode avaliar cada resultado como **Útil** ou **Não útil**. As análises geradas ficam disponíveis no histórico do produtor.
 
 A versão integrada em `campodigital-backend/public` também foi atualizada. As duas interfaces utilizam a mesma API. Para trabalhar no frontend separado, edite esta pasta e execute `npm run dev`; `npm run build` verifica e gera a versão de produção.
 
