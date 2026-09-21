@@ -2,7 +2,7 @@
   "name": "campodigital-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "Frontend del MVP financiero CampoDigital.",
+  "description": "Frontend do MVP financeiro CampoDigital.",
   "type": "module",
   "engines": {
     "node": ">=22"

@@ -28,7 +28,7 @@ const authService = {
   },
   async login(input) {
     if (input.password !== 'correct-password') {
-      throw Object.assign(new Error('Credenciales inválidas.'), { status: 401 });
+      throw Object.assign(new Error('Credenciais inválidas.'), { status: 401 });
     }
     return { usuario: fakeUser, accessToken: 'login-token', expiresIn: 3600 };
   },
@@ -55,7 +55,7 @@ after(async () => {
   });
 });
 
-test('POST /api/auth/register crea una sesión', async () => {
+test('POST /api/auth/register cria uma sessão', async () => {
   const response = await fetch(`${baseUrl}/api/auth/register`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -68,19 +68,19 @@ test('POST /api/auth/register crea una sesión', async () => {
   assert.equal(body.accessToken, 'registered-token');
 });
 
-test('POST /api/auth/login rechaza credenciales incorrectas', async () => {
+test('POST /api/auth/login rejeita credenciais incorretas', async () => {
   const response = await fetch(`${baseUrl}/api/auth/login`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email: fakeUser.email, password: 'incorrecta' }),
+    body: JSON.stringify({ email: fakeUser.email, password: 'incorreta' }),
   });
   const body = await response.json();
 
   assert.equal(response.status, 401);
-  assert.equal(body.message, 'Credenciales inválidas.');
+  assert.equal(body.message, 'Credenciais inválidas.');
 });
 
-test('GET /api/auth/me exige y valida un token', async () => {
+test('GET /api/auth/me exige e valida um token', async () => {
   const { createAccessToken } = await import('../src/auth/token.js');
   const token = createAccessToken(fakeUser, tokenOptions);
   const response = await fetch(`${baseUrl}/api/auth/me`, {

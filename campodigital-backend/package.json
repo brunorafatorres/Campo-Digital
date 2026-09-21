@@ -2,7 +2,7 @@
   "name": "campodigital-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "API backend del MVP financiero CampoDigital.",
+  "description": "API backend do MVP financeiro CampoDigital.",
   "type": "module",
   "engines": {
     "node": ">=22"

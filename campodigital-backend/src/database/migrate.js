@@ -18,7 +18,7 @@ const connection = await mysql.createConnection({
 
 try {
   await connection.query(sql);
-  console.log(`Migración 001_core aplicada en ${env.database.name}.`);
+  console.log(`Migração 001_core aplicada em ${env.database.name}.`);
 } finally {
   await connection.end();
 }

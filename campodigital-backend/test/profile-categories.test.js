@@ -64,19 +64,19 @@ after(async () => {
   await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 });
 
-test('las actividades requieren autenticación', async () => {
+test('as atividades exigem autenticação', async () => {
   const response = await fetch(`${baseUrl}/api/actividades`);
   assert.equal(response.status, 401);
 });
 
-test('lista las actividades del productor autenticado', async () => {
+test('lista as atividades do produtor autenticado', async () => {
   const response = await fetch(`${baseUrl}/api/actividades`, { headers: authorization });
   const body = await response.json();
   assert.equal(response.status, 200);
   assert.equal(body.actividades[0].nombre, 'Gado de corte');
 });
 
-test('crea una actividad para el productor autenticado', async () => {
+test('cria uma atividade para o produtor autenticado', async () => {
   const response = await fetch(`${baseUrl}/api/actividades`, {
     method: 'POST',
     headers: authorization,
@@ -99,7 +99,7 @@ test('atualiza uma atividade do produtor autenticado', async () => {
   assert.equal(body.actividad.activa, false);
 });
 
-test('crea una categoría propia', async () => {
+test('cria uma categoria própria', async () => {
   const response = await fetch(`${baseUrl}/api/categorias`, {
     method: 'POST',
     headers: authorization,
@@ -110,7 +110,7 @@ test('crea una categoría propia', async () => {
   assert.equal(body.categoria.id, 9);
 });
 
-test('desactiva solamente una categoría propia', async () => {
+test('desativa somente uma categoria própria', async () => {
   const response = await fetch(`${baseUrl}/api/categorias/9/desactivar`, {
     method: 'PATCH',
     headers: authorization,
@@ -118,7 +118,7 @@ test('desactiva solamente una categoría propia', async () => {
   assert.equal(response.status, 204);
 });
 
-test('sirve el frontend desde la raíz', async () => {
+test('disponibiliza o frontend a partir da raiz', async () => {
   const response = await fetch(`${baseUrl}/`);
   const html = await response.text();
   assert.equal(response.status, 200);

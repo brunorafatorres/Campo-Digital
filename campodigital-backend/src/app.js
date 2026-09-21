@@ -56,7 +56,7 @@ export function createApp(overrides = {}) {
   app.use((request, response) => {
     response.status(404).json({
       status: 'error',
-      message: `Ruta no encontrada: ${request.method} ${request.originalUrl}`,
+      message: `Rota não encontrada: ${request.method} ${request.originalUrl}`,
     });
   });
 

@@ -1,37 +1,37 @@
 # CampoDigital Frontend
 
-Frontend separado del MVP financiero CampoDigital, desarrollado con HTML, CSS y JavaScript.
+Frontend separado do MVP financeiro CampoDigital, desenvolvido com HTML, CSS e JavaScript.
 
 ## Requisitos
 
-- Node.js 22 o superior
-- Backend CampoDigital ejecutándose en `http://localhost:3000`
+- Node.js 22 ou superior
+- Backend CampoDigital em execução em `http://localhost:3000`
 
-## Cómo iniciar
+## Como iniciar
 
-Abre una terminal en la carpeta del backend:
+Abra um terminal na pasta do backend:
 
 ```powershell
 npm run dev
 ```
 
-Abre otra terminal en esta carpeta del frontend:
+Abra outro terminal nesta pasta do frontend:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Después abre `http://localhost:5173`.
+Depois, abra `http://localhost:5173`.
 
-Vite enviará automáticamente las solicitudes `/api` al backend de `localhost:3000`, por lo que no es necesario habilitar CORS durante el desarrollo local.
+O Vite encaminhará automaticamente as solicitações `/api` ao backend em `localhost:3000`. Portanto, não é necessário habilitar CORS durante o desenvolvimento local.
 
-## Archivos principales
+## Arquivos principais
 
-- `index.html`: estructura de las pantallas.
-- `styles.css`: diseño responsivo.
-- `app.js`: autenticación, navegación y consumo de la API.
-- `vite.config.js`: servidor local y conexión con el backend.
+- `index.html`: estrutura das telas.
+- `styles.css`: visual responsivo.
+- `app.js`: autenticação, navegação e consumo da API.
+- `vite.config.js`: servidor local e conexão com o backend.
 
 ## Movimentações financeiras
 

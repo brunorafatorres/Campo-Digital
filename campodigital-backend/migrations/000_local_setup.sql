@@ -1,5 +1,5 @@
--- Ejecuta este archivo una sola vez como administrador de MySQL.
--- Sustituye change_me por la misma contraseña que usarás en tu archivo .env.
+-- Execute este arquivo uma única vez como administrador do MySQL.
+-- Substitua change_me pela mesma senha que será usada no arquivo .env.
 
 CREATE DATABASE IF NOT EXISTS campodigital
   CHARACTER SET utf8mb4

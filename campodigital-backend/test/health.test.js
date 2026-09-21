@@ -29,7 +29,7 @@ after(async () => {
   });
 });
 
-test('GET /health informa que la API está activa', async () => {
+test('GET /health informa que a API está ativa', async () => {
   const response = await fetch(`${baseUrl}/health`);
   const body = await response.json();
 
@@ -39,7 +39,7 @@ test('GET /health informa que la API está activa', async () => {
   assert.equal(typeof body.timestamp, 'string');
 });
 
-test('una ruta desconocida responde con 404', async () => {
+test('uma rota desconhecida responde com 404', async () => {
   const response = await fetch(`${baseUrl}/no-existe`);
   const body = await response.json();
 

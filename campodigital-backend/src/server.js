@@ -5,15 +5,15 @@ import { closeDatabasePool } from './database/pool.js';
 const app = createApp();
 
 const server = app.listen(env.port, () => {
-  console.log(`CampoDigital API listening on http://localhost:${env.port}`);
+  console.log(`API CampoDigital disponível em http://localhost:${env.port}`);
 });
 
 async function shutdown(signal) {
-  console.log(`${signal} received. Closing server...`);
+  console.log(`${signal} recebido. Encerrando o servidor...`);
 
   server.close(async (error) => {
     if (error) {
-      console.error('Failed to close HTTP server:', error);
+      console.error('Não foi possível encerrar o servidor HTTP:', error);
       process.exitCode = 1;
       return;
     }
@@ -21,7 +21,7 @@ async function shutdown(signal) {
     try {
       await closeDatabasePool();
     } catch (databaseError) {
-      console.error('Failed to close database pool:', databaseError);
+      console.error('Não foi possível encerrar o pool do banco de dados:', databaseError);
       process.exitCode = 1;
     }
   });

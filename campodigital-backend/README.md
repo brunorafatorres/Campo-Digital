@@ -1,63 +1,63 @@
 # CampoDigital Backend
 
-API inicial del MVP de gestión financiera para productores rurales.
+API inicial do MVP de gestão financeira para produtores rurais.
 
 ## Requisitos
 
-- Node.js 22 o superior
-- MySQL 8.0.16 o superior
+- Node.js 22 ou superior
+- MySQL 8.0.16 ou superior
 
-## Primer arranque
+## Primeira execução
 
-1. En MySQL Workbench, abre `migrations/000_local_setup.sql`, cambia `change_me` por una contraseña local y ejecútalo como administrador.
-2. Copia `.env.example` como `.env` y usa en `DB_PASSWORD` la misma contraseña del paso anterior.
-3. Instala las dependencias con `npm install`.
-4. Ejecuta `npm run db:migrate` para crear las tablas esenciales.
-5. Ejecuta `npm run db:check` para confirmar que las tablas possuem as colunas esperadas.
-6. Inicia el servidor con `npm run dev`.
+1. No MySQL Workbench, abra `migrations/000_local_setup.sql`, substitua `change_me` por uma senha local e execute o arquivo como administrador.
+2. Copie `.env.example` como `.env` e use em `DB_PASSWORD` a mesma senha da etapa anterior.
+3. Instale as dependências com `npm install`.
+4. Execute `npm run db:migrate` para criar as tabelas essenciais.
+5. Execute `npm run db:check` para confirmar que as tabelas possuem as colunas esperadas.
+6. Inicie o servidor com `npm run dev`.
 
-El usuario `campodigital` queda limitado a la base del proyecto. No uses la cuenta `root` para ejecutar normalmente la API.
+O usuário `campodigital` fica limitado ao banco do projeto. Não utilize a conta `root` para executar normalmente a API.
 
-## Endpoints disponibles
+## Endpoints disponíveis
 
-- `GET /health`: confirma que la API está activa.
-- `GET /health/database`: confirma que MySQL responde.
-- `POST /api/auth/register`: registra un productor e inicia su sesión.
-- `POST /api/auth/login`: inicia sesión.
-- `GET /api/auth/me`: devuelve el usuario autenticado; requiere `Authorization: Bearer <token>`.
-- `GET /api/actividades`: lista las actividades productivas propias.
-- `POST /api/actividades`: crea una actividad productiva.
-- `PUT /api/actividades/:id`: actualiza una actividad propia.
-- `GET /api/categorias`: lista categorías del sistema y propias.
-- `POST /api/categorias`: crea una categoría propia.
-- `PATCH /api/categorias/:id/desactivar`: desactiva una categoría propia.
+- `GET /health`: confirma que a API está ativa.
+- `GET /health/database`: confirma que o MySQL está respondendo.
+- `POST /api/auth/register`: registra um produtor e inicia sua sessão.
+- `POST /api/auth/login`: inicia uma sessão.
+- `GET /api/auth/me`: devolve o usuário autenticado; exige `Authorization: Bearer <token>`.
+- `GET /api/actividades`: lista as atividades produtivas do usuário.
+- `POST /api/actividades`: cria uma atividade produtiva.
+- `PUT /api/actividades/:id`: atualiza uma atividade do usuário.
+- `GET /api/categorias`: lista categorias do sistema e do usuário.
+- `POST /api/categorias`: cria uma categoria própria.
+- `PATCH /api/categorias/:id/desactivar`: desativa uma categoria própria.
 - `GET /api/movimientos/graficos`: agrupa os valores por categoria e por mês.
 - `POST /api/ia/sugerir-categoria`: solicita uma categoria ao serviço Python/TensorFlow.
 
 ## Frontend
 
-Con la API iniciada, abre `http://localhost:3000`. La interfaz utiliza HTML, CSS y JavaScript y ya permite registrarse, iniciar sesión, gestionar actividades productivas, categorías y movimientos financieros. No necesita iniciar otro servidor.
+Com a API iniciada, abra `http://localhost:3000`. A interface utiliza HTML, CSS e JavaScript e permite cadastrar uma conta, iniciar uma sessão e gerenciar atividades produtivas, categorias e movimentações financeiras. Não é necessário iniciar outro servidor para a interface integrada.
 
-Ejemplo:
+Exemplo:
 
 ```bash
 curl http://localhost:3000/health
 curl http://localhost:3000/health/database
 ```
 
-Registro:
+Cadastro:
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"nombre":"Bruno","email":"bruno@example.com","password":"una-clave-segura"}'
+  -d '{"nombre":"Bruno","email":"bruno@example.com","password":"uma-senha-segura"}'
 ```
 
-Guarda el `accessToken` de la respuesta para las rutas protegidas. La contraseña se almacena con `scrypt` y nunca en texto plano.
+Guarde o `accessToken` da resposta para utilizar as rotas protegidas. A senha é armazenada com `scrypt`, nunca como texto simples.
 
-## Alcance actual
+## Escopo atual
 
-Esta versión contiene configuración, servidor Express, pool MySQL, comprobaciones de salud, migración de las cuatro tablas esenciales, autenticación por token, perfil productivo, categorías y un frontend responsivo. También incluye registro, edición, eliminación y consulta de movimientos financieros com totais e gráficos por período.
+Esta versão contém configuração, servidor Express, pool MySQL, verificações de funcionamento, migração das quatro tabelas essenciais, autenticação por token, perfil produtivo, categorias e frontend responsivo. Também inclui cadastro, edição, exclusão e consulta de movimentações financeiras com totais e gráficos por período.
 
 ## Movimentações financeiras (RF03 a RF07)
 
@@ -105,7 +105,7 @@ Os filtros são opcionais, combináveis e incluem ambas as datas. Sem período, 
 
 Este módulo usa a tabela `movimientos_financieros` já existente em `migrations/001_core.sql`, com as categorias `es_sistema`/`activa`. Não há nova migração nesta etapa. Em uma instalação nova, execute `npm run db:migrate`; uma base criada com outra versão do SQL deve ser conferida antes de usar o módulo.
 
-A migração também adapta, sem apagar registros, o esquema produzido na primeira etapa do TCC, no qual as categorias utilizavam os nomes `es_global` e `activo`. Se a interface mostrar “Erro interno del servidor” nas telas de produção, categorias e movimentações, pare o servidor, execute `npm run db:migrate` e depois `npm run db:check`.
+A migração também adapta, sem apagar registros, o esquema produzido na primeira etapa do TCC, no qual as categorias utilizavam os nomes `es_global` e `activo`. Se a interface mostrar “Erro interno do servidor” nas telas de produção, categorias e movimentações, pare o servidor, execute `npm run db:migrate` e depois `npm run db:check`.
 
 ## Tecnologias definidas no TCC
 

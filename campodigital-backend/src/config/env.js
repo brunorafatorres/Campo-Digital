@@ -10,7 +10,7 @@ function readInteger(name, fallback) {
   const value = Number.parseInt(rawValue, 10);
 
   if (!Number.isInteger(value) || value <= 0) {
-    throw new Error(`${name} debe ser un número entero positivo.`);
+    throw new Error(`${name} deve ser um número inteiro positivo.`);
   }
 
   return value;
@@ -20,7 +20,7 @@ function readRequired(name) {
   const value = process.env[name]?.trim();
 
   if (!value) {
-    throw new Error(`Falta la variable de entorno obligatoria ${name}.`);
+    throw new Error(`Falta a variável de ambiente obrigatória ${name}.`);
   }
 
   return value;

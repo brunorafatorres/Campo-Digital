@@ -29,7 +29,7 @@ healthRouter.get('/database', async (_request, response) => {
       database: 'connected',
     });
   } catch (error) {
-    console.error('Database health check failed:', error.message);
+    console.error('Falha ao verificar a conexão com o banco de dados:', error.message);
 
     return response.status(503).json({
       status: 'error',
