@@ -122,11 +122,11 @@ A migração também adapta, sem apagar registros, o esquema produzido na primei
 
 O serviço de IA será independente do funcionamento financeiro básico. Se ele estiver indisponível, autenticação, categorias, atividades e movimentações continuarão funcionando.
 
-## Sugestão de categorias com IA (RF10 e RF16)
+## Sugestão de categorias com IA (RF10, RF16 e RF17)
 
 Prepare o serviço conforme `../campodigital-ai/README.md` e mantenha `python server.py` em execução. No formulário de movimentações, informe o tipo e a descrição e pressione **Sugerir categoria com IA**. A categoria continua editável antes de salvar.
 
-A API registra `categoria_sugerida_id` e `confianza_ia`; assim, a categoria final pode ser comparada com a sugestão para aproveitar correções em uma etapa posterior. Se o serviço estiver desligado ou exceder o tempo limite, a API responde 503 somente para a sugestão e o lançamento manual continua disponível.
+A API registra `categoria_sugerida_id` e `confianza_ia`. Quando o produtor altera a categoria sugerida, a movimentação passa a funcionar como exemplo de correção. Em solicitações futuras, o backend procura descrições semelhantes nas correções do próprio produtor e prioriza a categoria final escolhida por ele. Sem correspondência suficiente, o serviço TensorFlow continua responsável pela classificação. Se o serviço estiver desligado ou exceder o tempo limite, a API responde 503 somente para a sugestão e o lançamento manual continua disponível.
 
 ## Análises e insights financeiros
 
@@ -151,7 +151,7 @@ npm test
 node --test test/movements.test.js
 ```
 
-A suíte contém 47 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA, análises financeiras, alertas, preferências, avaliação dos insights, histórico e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow.**
+A suíte contém 49 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA, aprendizado com correções, análises financeiras, alertas, preferências, avaliação dos insights, histórico e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow.**
 
 Para conferir com seu banco local: registre uma receita de R$ 150,50 e uma despesa de R$ 58,25 no mesmo período. O saldo deve ser R$ 92,25. Edite a receita para R$ 200,10 (saldo R$ 141,85), aplique os filtros e exclua a despesa (saldo R$ 200,10). Atualize a página para conferir a persistência e use uma segunda conta para verificar que ela não vê os lançamentos da primeira.
 

@@ -2,6 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 
 import { createCategorySuggestionClient } from './ai/category-suggestion.client.js';
+import { createCategoryCorrectionRepository } from './ai/category-correction.repository.js';
 import { createCategorySuggestionRouter } from './ai/category-suggestion.routes.js';
 import { createCategorySuggestionService } from './ai/category-suggestion.service.js';
 import { createActivityRepository } from './activities/activity.repository.js';
@@ -38,8 +39,10 @@ export function createApp(overrides = {}) {
   const categoryService = overrides.categoryService
     ?? createCategoryService(createCategoryRepository(pool));
   const aiClient = overrides.aiClient ?? createCategorySuggestionClient(env.ai);
+  const categoryCorrectionRepository = overrides.categoryCorrectionRepository
+    ?? createCategoryCorrectionRepository(pool);
   const categorySuggestionService = overrides.categorySuggestionService
-    ?? createCategorySuggestionService(categoryService, aiClient);
+    ?? createCategorySuggestionService(categoryService, aiClient, categoryCorrectionRepository);
   const movementService = overrides.movementService
     ?? createMovementService(createMovementRepository(pool));
   const insightService = overrides.insightService

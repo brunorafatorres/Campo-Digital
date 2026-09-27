@@ -87,7 +87,9 @@ export function createFinance({ api, toast, onUnauthorized }) {
         confianza_ia: result.confianca,
       };
       status.className = 'ai-success';
-      status.textContent = `IA sugeriu “${result.categoria.nombre}” (${Number(result.confianca).toFixed(1)}%). Você pode alterar antes de salvar.`;
+      status.textContent = result.aprendeu_com_correcao
+        ? `Sugestão personalizada: “${result.categoria.nombre}” (${Number(result.confianca).toFixed(1)}%), com base em uma correção anterior.`
+        : `IA sugeriu “${result.categoria.nombre}” (${Number(result.confianca).toFixed(1)}%). Você pode alterar antes de salvar.`;
     } catch (error) {
       aiSuggestion = null;
       status.className = 'ai-error';

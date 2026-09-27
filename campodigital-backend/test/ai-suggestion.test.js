@@ -32,7 +32,37 @@ test('IA: devolve uma categoria visível do produtor e informa que é sugestão'
   assert.equal(result.categoria.id, 2);
   assert.equal(result.confianca, 88.4);
   assert.equal(result.gerada_por_ia, true);
+  assert.equal(result.aprendeu_com_correcao, false);
   assert.match(result.aviso, /pode alterar/i);
+});
+
+test('IA: prioriza uma correção anterior do próprio produtor', async () => {
+  const correctionRepository = { async listCorrections(userId, type) {
+    assert.equal(userId, '7');
+    assert.equal(type, 'GASTO');
+    return [{ categoria_id: 3, descripcion: 'diesel para o trator', categoria: 'Outros gastos' }];
+  } };
+  const client = { async suggest() {
+    assert.fail('TensorFlow não deve ser consultado quando existe uma correção semelhante.');
+  } };
+  const result = await createCategorySuggestionService(categoryService, client, correctionRepository)
+    .suggest('7', { descripcion: 'compra de diesel para trator', tipo: 'GASTO' });
+  assert.equal(result.categoria.id, 3);
+  assert.equal(result.aprendeu_com_correcao, true);
+  assert.match(result.aviso, /correção anterior/i);
+});
+
+test('IA: usa o modelo quando não encontra correção semelhante', async () => {
+  const correctionRepository = { async listCorrections() {
+    return [{ categoria_id: 3, descripcion: 'compra de sementes', categoria: 'Outros gastos' }];
+  } };
+  const client = { async suggest() {
+    return { categoria_chave: 'COMBUSTIVEL', confianca: 82 };
+  } };
+  const result = await createCategorySuggestionService(categoryService, client, correctionRepository)
+    .suggest('7', { descripcion: 'abastecimento do trator', tipo: 'GASTO' });
+  assert.equal(result.categoria.id, 2);
+  assert.equal(result.aprendeu_com_correcao, false);
 });
 
 test('IA: falha do serviço não impede o uso manual', async () => {
