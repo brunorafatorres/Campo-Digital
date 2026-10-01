@@ -5,6 +5,7 @@ import { createCategorySuggestionClient } from './ai/category-suggestion.client.
 import { createCategoryCorrectionRepository } from './ai/category-correction.repository.js';
 import { createCategorySuggestionRouter } from './ai/category-suggestion.routes.js';
 import { createCategorySuggestionService } from './ai/category-suggestion.service.js';
+import { createInvoiceAnalysisService } from './ai/invoice-analysis.service.js';
 import { createActivityRepository } from './activities/activity.repository.js';
 import { createActivityRouter } from './activities/activity.routes.js';
 import { createActivityService } from './activities/activity.service.js';
@@ -43,6 +44,8 @@ export function createApp(overrides = {}) {
     ?? createCategoryCorrectionRepository(pool);
   const categorySuggestionService = overrides.categorySuggestionService
     ?? createCategorySuggestionService(categoryService, aiClient, categoryCorrectionRepository);
+  const invoiceAnalysisService = overrides.invoiceAnalysisService
+    ?? createInvoiceAnalysisService(aiClient, categorySuggestionService);
   const movementService = overrides.movementService
     ?? createMovementService(createMovementRepository(pool));
   const insightService = overrides.insightService
@@ -55,7 +58,7 @@ export function createApp(overrides = {}) {
   app.use('/api/auth', createAuthRouter(authService, requireAuth));
   app.use('/api/actividades', createActivityRouter(activityService, requireAuth));
   app.use('/api/categorias', createCategoryRouter(categoryService, requireAuth));
-  app.use('/api/ia', createCategorySuggestionRouter(categorySuggestionService, requireAuth));
+  app.use('/api/ia', createCategorySuggestionRouter(categorySuggestionService, requireAuth, invoiceAnalysisService));
   app.use('/api/movimientos', createMovementRouter(movementService, requireAuth));
   app.use('/api/insights', createInsightRouter(insightService, requireAuth));
 

@@ -168,6 +168,11 @@
           <div class="section-heading"><div><p class="eyebrow">Controle financeiro</p><h2>Movimentações</h2><p>Registre o que entra e sai da sua produção.</p></div></div>
           <form id="movement-form" class="surface form-card">
             <h3 id="movement-form-title">Nova movimentação</h3>
+            <div class="invoice-upload-field">
+              <label class="field" for="invoice-image"><span>Foto do comprovante</span><input id="invoice-image" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><small>JPEG, PNG ou WebP; até 5 MB. A imagem é analisada e descartada, não fica salva.</small></label>
+              <button id="invoice-analyze" class="secondary-button" type="button">Preencher com IA</button>
+              <p id="invoice-status" role="status" aria-live="polite">A leitura cria um rascunho. Confira os dados e salve manualmente.</p>
+            </div>
             <div class="movement-form-grid">
               <label class="field"><span>Tipo</span><select id="movement-type"><option value="INGRESO">Receita</option><option value="GASTO">Despesa</option></select></label>
               <label class="field"><span>Valor (R$)</span><input id="movement-value" inputmode="decimal" required maxlength="15" pattern="[0-9]{1,12}([.,][0-9]{1,2})?" placeholder="Ex.: 150,50"><small>Sem separador de milhar.</small></label>

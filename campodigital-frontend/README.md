@@ -39,6 +39,8 @@ O módulo está disponível no menu Movimentações: cadastro e edição de rece
 
 O formulário também oferece **Sugerir categoria com IA**. A opção chama o backend, que primeiro consulta correções anteriores do próprio produtor e, quando não encontra uma descrição semelhante, comunica-se com o serviço Python/TensorFlow. A categoria sugerida pode ser alterada, e o cadastro manual permanece funcionando quando a IA está indisponível.
 
+No formulário há também **Foto do comprovante / Preencher com IA**. O backend local extrai fornecedor, valor e data por OCR e sugere uma categoria; a interface recebe apenas um rascunho editável. É necessário manter o serviço de IA ligado e instalar Tesseract OCR com o idioma português. O usuário deve conferir os dados e salvar manualmente; a imagem não é armazenada. Veja os detalhes no README do serviço de IA.
+
 - `finance.js`: comportamento do módulo financeiro, formulários, filtros e totais.
 - `insights.js`: geração, apresentação e histórico das análises financeiras.
 - `app.js`: autenticação e integração dos módulos.

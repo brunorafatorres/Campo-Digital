@@ -53,6 +53,10 @@ export function createFinance({ api, toast, onUnauthorized }) {
     $('#movement-cancel').disabled = false;
     $('#movement-cancel').classList.add('hidden');
     $('#movement-error').textContent = '';
+    $('#invoice-image').value = '';
+    $('#invoice-analyze').disabled = false;
+    $('#invoice-status').className = '';
+    $('#invoice-status').textContent = 'A leitura cria um rascunho. Confira os dados e salve manualmente.';
     clearSuggestion();
     categoryOptions();
   }
@@ -92,6 +96,66 @@ export function createFinance({ api, toast, onUnauthorized }) {
         : `IA sugeriu “${result.categoria.nombre}” (${Number(result.confianca).toFixed(1)}%). Você pode alterar antes de salvar.`;
     } catch (error) {
       aiSuggestion = null;
+      status.className = 'ai-error';
+      status.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function analyzeInvoice() {
+    const file = $('#invoice-image').files[0];
+    const status = $('#invoice-status');
+    const button = $('#invoice-analyze');
+    if (editing) {
+      status.className = 'ai-error';
+      status.textContent = 'A leitura do comprovante está disponível ao criar um novo lançamento.';
+      return;
+    }
+    if (!file) {
+      status.className = 'ai-error';
+      status.textContent = 'Escolha ou tire uma foto do comprovante primeiro.';
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      status.className = 'ai-error';
+      status.textContent = 'Use uma imagem JPEG, PNG ou WebP de até 5 MB.';
+      return;
+    }
+
+    button.disabled = true;
+    status.className = '';
+    status.textContent = 'Lendo a imagem e identificando os dados…';
+    try {
+      const result = await api('/api/ia/analisar-comprovante', {
+        method: 'POST',
+        headers: { 'content-type': file.type },
+        body: file,
+      });
+      const draft = result.movimentacao;
+      $('#movement-type').value = draft.tipo;
+      categoryOptions();
+      $('#movement-date').value = draft.fecha;
+      $('#movement-value').value = draft.valor;
+      $('#movement-description').value = draft.descricao;
+      $('#movement-category').value = draft.categoria ? String(draft.categoria.id) : '';
+      aiSuggestion = draft.categoria_sugerida_id ? {
+        categoria_sugerida_id: draft.categoria_sugerida_id,
+        confianza_ia: draft.confianza_ia,
+      } : null;
+
+      const needsReview = result.campos_para_conferir?.length
+        ? ` Não identificados: ${result.campos_para_conferir.join(', ')}.` : '';
+      const confidence = Number(result.confianca_leitura ?? 0);
+      const reviewWarning = confidence < 80 ? ' A leitura teve baixa confiança; confira tudo com atenção.' : '';
+      status.className = result.aviso_categoria ? '' : 'ai-success';
+      status.textContent = `${result.aviso} Confiança da leitura: ${confidence.toFixed(0)}%.${needsReview}${reviewWarning}${result.aviso_categoria ? ` ${result.aviso_categoria}` : ''}`;
+      $('#movement-ai-status').textContent = draft.categoria
+        ? `IA sugeriu “${draft.categoria.nombre}” (${Number(draft.confianza_ia).toFixed(1)}%). Revise ou altere antes de salvar.`
+        : 'Escolha uma categoria manualmente ou solicite a sugestão de IA.';
+      $('#movement-ai-status').className = draft.categoria ? 'ai-success' : '';
+      $('#movement-description').focus();
+    } catch (error) {
       status.className = 'ai-error';
       status.textContent = error.message;
     } finally {
@@ -237,6 +301,7 @@ export function createFinance({ api, toast, onUnauthorized }) {
 
   $('#movement-form').addEventListener('submit', save);
   $('#movement-suggest-category').addEventListener('click', suggestCategory);
+  $('#invoice-analyze').addEventListener('click', analyzeInvoice);
   $('#movement-cancel').addEventListener('click', resetForm);
   $('#movement-type').addEventListener('change', () => { clearSuggestion(); categoryOptions(); });
   $('#movement-description').addEventListener('input', () => {

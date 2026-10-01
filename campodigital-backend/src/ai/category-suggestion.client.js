@@ -21,5 +21,33 @@ export function createCategorySuggestionClient({ baseUrl, timeoutMs, fetchImpl =
         clearTimeout(timeout);
       }
     },
+
+    async readInvoice(image, contentType) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetchImpl(`${baseUrl}/read-invoice`, {
+          method: 'POST',
+          headers: { 'content-type': contentType },
+          body: image,
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw Object.assign(new Error(body.message ?? `Serviço de IA respondeu ${response.status}.`), {
+            status: response.status === 400 ? 400 : 503,
+          });
+        }
+        return await response.json();
+      } catch (error) {
+        if (error.status) throw error;
+        throw Object.assign(new Error('Leitura de comprovante indisponível. Tente novamente ou preencha manualmente.'), {
+          status: 503,
+          cause: error,
+        });
+      } finally {
+        clearTimeout(timeout);
+      }
+    },
   };
 }

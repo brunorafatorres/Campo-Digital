@@ -272,6 +272,11 @@ button { cursor: pointer; }
 .movement-form-grid, .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; margin-top: 24px; }
 .movement-form-grid .field, .filter-grid .field { margin: 0; }
 .movement-description-field { grid-column: 1 / -1; }
+.invoice-upload-field { display: grid; grid-template-columns: minmax(220px, 1fr) auto; align-items: end; gap: 10px 16px; margin-top: 18px; padding: 16px; border: 1px dashed #b8c9bc; border-radius: 14px; background: #f8faf6; }
+.invoice-upload-field .field { margin: 0; }
+.invoice-upload-field p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.invoice-upload-field p.ai-error { color: var(--danger); }
+.invoice-upload-field p.ai-success { color: var(--forest-2); font-weight: 700; }
 .ai-suggestion-field { display: flex; grid-column: 1 / -1; align-items: center; gap: 14px; }
 .ai-suggestion-field p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .ai-suggestion-field .ai-success { color: var(--forest-2); font-weight: 700; }
@@ -328,6 +333,8 @@ button:focus-visible { outline: 2px solid var(--forest-2); outline-offset: 3px; 
 .period-group small { line-height: 1.35; }
 @media (max-width: 620px) {
   .movement-form-grid, .filter-grid { grid-template-columns: 1fr; }
+  .invoice-upload-field { grid-template-columns: 1fr; }
+  .invoice-upload-field p { grid-column: 1; }
   .ai-suggestion-field { align-items: stretch; flex-direction: column; }
   .movement-filters { padding: 20px; }
   .button-row > button { flex: 1 1 auto; }

@@ -33,6 +33,7 @@ O usuário `campodigital` fica limitado ao banco do projeto. Não utilize a cont
 - `PATCH /api/categorias/:id/desactivar`: desativa uma categoria própria.
 - `GET /api/movimientos/graficos`: agrupa os valores por categoria e por mês.
 - `POST /api/ia/sugerir-categoria`: solicita uma categoria ao serviço Python/TensorFlow.
+- `POST /api/ia/analisar-comprovante`: analisa uma foto JPEG, PNG ou WebP de até 5 MB e devolve um rascunho financeiro para revisão.
 - `GET /api/insights`: consulta o histórico de análises financeiras do produtor.
 - `POST /api/insights/analisar`: gera e salva uma análise de um período escolhido.
 - `GET /api/insights/preferencias`: consulta as preferências de alertas do produtor.
@@ -128,6 +129,10 @@ Prepare o serviço conforme `../campodigital-ai/README.md` e mantenha `python se
 
 A API registra `categoria_sugerida_id` e `confianza_ia`. Quando o produtor altera a categoria sugerida, a movimentação passa a funcionar como exemplo de correção. Em solicitações futuras, o backend procura descrições semelhantes nas correções do próprio produtor e prioriza a categoria final escolhida por ele. Sem correspondência suficiente, o serviço TensorFlow continua responsável pela classificação. Se o serviço estiver desligado ou exceder o tempo limite, a API responde 503 somente para a sugestão e o lançamento manual continua disponível.
 
+### Leitura de comprovantes por foto
+
+Na tela **Movimentações**, selecione ou tire uma foto e pressione **Preencher com IA**. O serviço local tenta extrair o fornecedor, o total e a data, define o tipo inicial como despesa e sugere uma categoria. O formulário é preenchido como rascunho; a pessoa deve conferir/corrigir os campos e pressionar **Salvar movimentação**. Nenhum lançamento é gravado antes dessa confirmação. A imagem fica somente na memória durante a requisição e não é armazenada. OCR exige Tesseract e o idioma português, além das dependências Python descritas em `../campodigital-ai/README.md`. Confira em especial valores, datas e documentos com baixa confiança; OCR pode interpretar incorretamente textos borrados ou layouts variados.
+
 ## Análises e insights financeiros
 
 O menu **Análises** permite escolher um período de até 366 dias. O sistema gera um resumo em linguagem simples, compara receitas, despesas e saldo com o período anterior de mesma duração, calcula o impacto das categorias de despesas e identifica movimentações acima do padrão histórico quando existem dados suficientes. O produtor pode ativar alertas, escolher sua frequência e definir o percentual mínimo de aumento de despesas por categoria.
@@ -151,8 +156,8 @@ npm test
 node --test test/movements.test.js
 ```
 
-A suíte contém 49 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA, aprendizado com correções, análises financeiras, alertas, preferências, avaliação dos insights, histórico e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow.**
+A suíte contém 52 testes. Eles exercitam as rotas Express, tokens e serviços reais com repositórios em memória, cobrindo validações, permissões, categorias inativas, filtros, paginação, gráficos, metadados de IA, aprendizado com correções, leitura de comprovante como rascunho, análises financeiras, alertas, preferências, avaliação dos insights, histórico e continuidade do cadastro manual. **Não executam consultas em um servidor MySQL nem treinam o TensorFlow/Tesseract.**
 
 Para conferir com seu banco local: registre uma receita de R$ 150,50 e uma despesa de R$ 58,25 no mesmo período. O saldo deve ser R$ 92,25. Edite a receita para R$ 200,10 (saldo R$ 141,85), aplique os filtros e exclua a despesa (saldo R$ 200,10). Atualize a página para conferir a persistência e use uma segunda conta para verificar que ela não vê os lançamentos da primeira.
 
-A interface possui estados de carregamento/erro, confirmação antes da exclusão, gráficos financeiros acessíveis, sugestão opcional de categoria e suporte a telas pequenas.
+A interface possui estados de carregamento/erro, confirmação antes da exclusão, gráficos financeiros acessíveis, sugestão opcional de categoria, leitura de comprovante como rascunho revisável e suporte a telas pequenas.
