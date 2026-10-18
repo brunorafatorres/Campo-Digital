@@ -31,6 +31,13 @@ function toast(message) {
 }
 
 function setMode(mode) {
+  if (state.mode !== mode) {
+    $('#auth-form').reset();
+    $('#password').type = 'password';
+    $('#toggle-password').textContent = 'Mostrar';
+    $('#toggle-password').setAttribute('aria-label', 'Mostrar senha');
+    $('#toggle-password').setAttribute('aria-pressed', 'false');
+  }
   state.mode = mode;
   const isRegister = mode === 'register';
   $('#login-tab').classList.toggle('active', !isRegister);
@@ -85,9 +92,7 @@ async function enterApp() {
   }
   $('#auth-view').classList.add('hidden');
   $('#app-view').classList.remove('hidden');
-  $('#user-name').textContent = state.user.nombre;
-  $('#user-initial').textContent = state.user.nombre.slice(0, 1).toUpperCase();
-  $('#welcome-title').textContent = `Olá, ${state.user.nombre.split(' ')[0]}!`;
+  renderUser();
   const results = await Promise.allSettled([loadActivities(), loadCategories()]);
   if (state.token !== token) return;
   const failure = results.find((result) => result.status === 'rejected');
@@ -96,11 +101,53 @@ async function enterApp() {
   await Promise.all([finance.start(), insights.start()]);
 }
 
+function renderUser() {
+  $('#user-name').textContent = state.user.nombre;
+  $('#user-initial').textContent = state.user.nombre.slice(0, 1).toUpperCase();
+  $('#welcome-title').textContent = `Olá, ${state.user.nombre.split(' ')[0]}!`;
+  $('#profile-name').value = state.user.nombre;
+  $('#profile-email').value = state.user.email;
+  $('#profile-phone').value = state.user.telefone ?? '';
+  $('#profile-property').value = state.user.nome_propriedade ?? '';
+  $('#profile-location').value = state.user.localidade ?? '';
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+  const token = state.token;
+  const button = $('#profile-save');
+  const error = $('#profile-error');
+  error.textContent = '';
+  button.disabled = true;
+  try {
+    const result = await api('/api/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify({
+        nombre: $('#profile-name').value, email: $('#profile-email').value,
+        telefone: $('#profile-phone').value, nome_propriedade: $('#profile-property').value,
+        localidade: $('#profile-location').value,
+      }),
+    });
+    if (state.token !== token) return;
+    state.user = result.usuario;
+    renderUser();
+    toast('Perfil atualizado.');
+  } catch (requestError) {
+    if (state.token !== token) return;
+    if (requestError.status === 401) { logout(); toast('Sua sessão expirou. Entre novamente.'); return; }
+    error.textContent = requestError.message;
+  } finally {
+    if (state.token === token) button.disabled = false;
+  }
+}
+
 function logout() {
   finance.reset();
   insights.reset();
   state.activities = [];
   state.categories = [];
+  $('#profile-form').reset();
+  $('#profile-error').textContent = '';
   renderActivities();
   renderCategories();
   showSection('dashboard');
@@ -177,7 +224,7 @@ function editActivity(id) {
   $('#activity-description').value = item.descripcion || '';
   $('#activity-active').checked = Boolean(item.activa);
   $('#activity-active-field').classList.remove('hidden');
-  showSection('profile');
+  showSection('production');
   $('#activity-name').focus();
 }
 
@@ -252,6 +299,7 @@ $('#toggle-password').addEventListener(
 );
 $('#auth-form').addEventListener('submit', submitAuth);
 $('#logout').addEventListener('click', logout);
+$('#profile-form').addEventListener('submit', saveProfile);
 $('#activity-form').addEventListener('submit', saveActivity);
 $('#category-form').addEventListener('submit', saveCategory);
 $('#mobile-menu').addEventListener('click', () => $('.sidebar').classList.toggle('open'));

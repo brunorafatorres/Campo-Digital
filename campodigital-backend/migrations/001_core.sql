@@ -2,6 +2,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   nombre VARCHAR(120) NOT NULL,
   email VARCHAR(254) NOT NULL,
+  telefone VARCHAR(24) NULL,
+  nome_propriedade VARCHAR(120) NULL,
+  localidade VARCHAR(120) NULL,
   password_hash VARCHAR(255) NOT NULL,
   rol ENUM('PRODUCTOR', 'ADMIN') NOT NULL DEFAULT 'PRODUCTOR',
   activo BOOLEAN NOT NULL DEFAULT TRUE,
@@ -136,6 +139,36 @@ CREATE TABLE IF NOT EXISTS preferencias_alertas (
 -- instalações anteriores podem possuir activo/es_global e não possuir as
 -- colunas activa/es_sistema usadas pela aplicação atual.
 SET @schema_name = DATABASE();
+
+SET @has_phone = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name AND TABLE_NAME = 'usuarios' AND COLUMN_NAME = 'telefone'
+);
+SET @sql = IF(@has_phone = 0,
+  'ALTER TABLE usuarios ADD COLUMN telefone VARCHAR(24) NULL AFTER email', 'SELECT 1');
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_property = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name AND TABLE_NAME = 'usuarios' AND COLUMN_NAME = 'nome_propriedade'
+);
+SET @sql = IF(@has_property = 0,
+  'ALTER TABLE usuarios ADD COLUMN nome_propriedade VARCHAR(120) NULL AFTER telefone', 'SELECT 1');
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
+
+SET @has_location = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = @schema_name AND TABLE_NAME = 'usuarios' AND COLUMN_NAME = 'localidade'
+);
+SET @sql = IF(@has_location = 0,
+  'ALTER TABLE usuarios ADD COLUMN localidade VARCHAR(120) NULL AFTER nome_propriedade', 'SELECT 1');
+PREPARE migration_statement FROM @sql;
+EXECUTE migration_statement;
+DEALLOCATE PREPARE migration_statement;
 
 SET @has_insight_rating = (
   SELECT COUNT(*) FROM information_schema.COLUMNS

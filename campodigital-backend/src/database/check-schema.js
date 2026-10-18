@@ -3,7 +3,7 @@ import mysql from 'mysql2/promise';
 import { env } from '../config/env.js';
 
 const required = {
-  usuarios: ['id', 'nombre', 'email', 'password_hash', 'rol', 'activo'],
+  usuarios: ['id', 'nombre', 'email', 'telefone', 'nome_propriedade', 'localidade', 'password_hash', 'rol', 'activo'],
   actividades_productivas: ['id', 'usuario_id', 'nombre', 'descripcion', 'activa'],
   categorias_financieras: ['id', 'usuario_id', 'nombre', 'tipo', 'es_sistema', 'activa'],
   movimientos_financieros: ['id', 'usuario_id', 'categoria_id', 'categoria_sugerida_id',

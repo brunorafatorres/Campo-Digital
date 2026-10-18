@@ -30,5 +30,14 @@ export function createAuthRouter(authService, requireAuth) {
     }
   });
 
+  router.put('/me', requireAuth, async (request, response, next) => {
+    try {
+      const user = await authService.updateProfile(request.auth.sub, request.body);
+      response.json({ usuario: user });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }

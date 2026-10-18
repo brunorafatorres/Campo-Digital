@@ -25,6 +25,7 @@ O usuário `campodigital` fica limitado ao banco do projeto. Não utilize a cont
 - `POST /api/auth/register`: registra um produtor e inicia sua sessão.
 - `POST /api/auth/login`: inicia uma sessão.
 - `GET /api/auth/me`: devolve o usuário autenticado; exige `Authorization: Bearer <token>`.
+- `PUT /api/auth/me`: atualiza nome e e-mail do produtor autenticado; recebe `nombre` e `email` em JSON.
 - `GET /api/actividades`: lista as atividades produtivas do usuário.
 - `POST /api/actividades`: cria uma atividade produtiva.
 - `PUT /api/actividades/:id`: atualiza uma atividade do usuário.
@@ -60,6 +61,8 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```
 
 Guarde o `accessToken` da resposta para utilizar as rotas protegidas. A senha é armazenada com `scrypt`, nunca como texto simples.
+
+Em **Meu perfil**, o produtor pode alterar nome, e-mail, telefone, nome da propriedade e localidade. Os três últimos são opcionais. O novo e-mail deve ser único; o acesso seguinte usa o endereço atualizado. A senha permanece a mesma. Execute `npm run db:migrate` e `npm run db:check` após atualizar o projeto para criar as novas colunas na tabela `usuarios`, preservando os dados existentes.
 
 ## Escopo atual
 

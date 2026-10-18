@@ -74,7 +74,8 @@
         </a>
         <nav aria-label="Menu principal">
           <button class="nav-item active" data-section="dashboard"><span aria-hidden="true">▦</span> Visão geral</button>
-          <button class="nav-item" data-section="profile"><span aria-hidden="true">♧</span> Minha produção</button>
+          <button class="nav-item" data-section="profile"><span aria-hidden="true">◯</span> Meu perfil</button>
+          <button class="nav-item" data-section="production"><span aria-hidden="true">♧</span> Minha produção</button>
           <button class="nav-item" data-section="categories"><span aria-hidden="true">≡</span> Categorias</button>
           <button class="nav-item" type="button" data-section="movements"><span aria-hidden="true">↕</span> Movimentações</button>
           <button class="nav-item" type="button" data-section="insights"><span aria-hidden="true">✦</span> Análises</button>
@@ -121,7 +122,7 @@
               <div><p class="eyebrow">Primeiros passos</p><h3>Prepare sua conta</h3></div>
               <ol>
                 <li id="step-account" class="done"><span>✓</span><div><strong>Conta criada</strong><small>Seu acesso já está protegido.</small></div></li>
-                <li id="step-activity"><span>2</span><div><strong>Cadastre sua produção</strong><small>Informe sua principal atividade rural.</small></div><button data-go="profile">Cadastrar</button></li>
+                <li id="step-activity"><span>2</span><div><strong>Cadastre sua produção</strong><small>Informe sua principal atividade rural.</small></div><button data-go="production">Cadastrar</button></li>
                 <li id="step-category"><span>3</span><div><strong>Organize as categorias</strong><small>Crie categorias que combinam com seu negócio.</small></div><button data-go="categories">Organizar</button></li>
               </ol>
             </article>
@@ -135,6 +136,27 @@
         </section>
 
         <section id="profile-section" class="content-section hidden">
+          <div class="section-heading"><div><p class="eyebrow">Dados da conta</p><h2>Meu perfil</h2><p>Seus dados de acesso e as informações da propriedade em um só lugar.</p></div></div>
+          <form id="profile-form" class="surface form-card profile-form">
+            <h3>Dados pessoais</h3>
+            <p class="profile-note">Nome e e-mail são usados para identificar sua conta.</p>
+            <div class="profile-fields">
+              <label class="field"><span>Nome completo</span><input id="profile-name" required minlength="2" maxlength="120" autocomplete="name"></label>
+              <label class="field"><span>E-mail de acesso</span><input id="profile-email" type="email" required maxlength="254" autocomplete="email"></label>
+              <label class="field"><span>Telefone <small>(opcional)</small></span><input id="profile-phone" type="tel" maxlength="24" autocomplete="tel" inputmode="tel" placeholder="Ex.: (55) 99999-9999"></label>
+            </div>
+            <h3 class="profile-subheading">Propriedade rural</h3>
+            <p class="profile-note">Preencha se desejar; essas informações ajudam a identificar sua produção.</p>
+            <div class="profile-fields">
+              <label class="field"><span>Nome da propriedade <small>(opcional)</small></span><input id="profile-property" maxlength="120" placeholder="Ex.: Sítio Boa Esperança"></label>
+              <label class="field"><span>Localidade ou município <small>(opcional)</small></span><input id="profile-location" maxlength="120" placeholder="Ex.: Rivera"></label>
+            </div>
+            <p id="profile-error" class="form-error" role="alert"></p>
+            <button id="profile-save" class="primary-button fit" type="submit">Salvar alterações</button>
+          </form>
+        </section>
+
+        <section id="production-section" class="content-section hidden">
           <div class="section-heading"><div><p class="eyebrow">Perfil produtivo</p><h2>Minha produção</h2><p>Conte qual é a principal atividade desenvolvida na propriedade.</p></div></div>
           <div class="form-layout">
             <form id="activity-form" class="surface form-card">
@@ -169,8 +191,8 @@
           <form id="movement-form" class="surface form-card">
             <h3 id="movement-form-title">Nova movimentação</h3>
             <div class="invoice-upload-field">
-              <label class="field" for="invoice-image"><span>Foto do comprovante</span><input id="invoice-image" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><small>JPEG, PNG ou WebP; até 5 MB. A imagem é analisada e descartada, não fica salva.</small></label>
-              <button id="invoice-analyze" class="secondary-button" type="button">Preencher com IA</button>
+              <label class="field" for="invoice-image"><span>Foto do comprovante</span><input id="invoice-image" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><small>Fotografe um comprovante por vez. JPEG, PNG ou WebP, até 5 MB; a foto não fica salva.</small></label>
+              <button id="invoice-analyze" class="secondary-button" type="button">Ler foto e preencher com IA</button>
               <p id="invoice-status" role="status" aria-live="polite">A leitura cria um rascunho. Confira os dados e salve manualmente.</p>
             </div>
             <div class="movement-form-grid">
@@ -210,7 +232,7 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow">Inteligência financeira</p>
-              <h2>Análises e insights</h2>
+              <h2>Análises financeiras</h2>
               <p>Escolha um período para comparar resultados e identificar pontos de atenção.</p>
             </div>
             <span class="ai-label">Gerado por análise automática</span>

@@ -50,7 +50,7 @@ export function verifyAccessToken(token, { secret, now = Date.now() }) {
   }
 
   if (!claims.sub || !claims.rol || !claims.exp || claims.exp <= Math.floor(now / 1000)) {
-    throw new Error('Token vencido o inválido.');
+    throw new Error('Sessão expirada ou inválida.');
   }
 
   return claims;

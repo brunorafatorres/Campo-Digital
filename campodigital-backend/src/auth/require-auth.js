@@ -6,7 +6,7 @@ export function createRequireAuth(tokenOptions) {
     const [scheme, token] = authorization.split(' ');
 
     if (scheme !== 'Bearer' || !token) {
-      return next(Object.assign(new Error('Autenticación requerida.'), { status: 401 }));
+      return next(Object.assign(new Error('Entre na sua conta para continuar.'), { status: 401 }));
     }
 
     try {

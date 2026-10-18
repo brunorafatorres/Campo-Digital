@@ -105,6 +105,14 @@ button { cursor: pointer; }
 .support-card small { color: #87918c; }
 
 .form-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, .6fr); gap: 18px; }
+.profile-form { max-width: 760px; }
+.profile-note { margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
+.profile-form h3.profile-subheading { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+.profile-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; margin: 20px 0 22px; }
+.profile-fields .field { margin-bottom: 0; }
+.field input, .field select { min-height: 48px; }
+.nav-item, .auth-tab, .secondary-button { min-height: 44px; }
+:where(button, input, textarea, select):focus-visible { outline: 3px solid #397455; outline-offset: 2px; }
 .form-card, .info-card, .inline-form { padding: 26px; }
 .info-card > span { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 22px; border-radius: 15px; color: var(--forest); background: var(--leaf); font-size: 24px; }
 .info-card p { color: var(--muted); line-height: 1.65; }
@@ -148,6 +156,8 @@ button { cursor: pointer; }
 }
 
 @media (max-width: 620px) {
+  .profile-fields { grid-template-columns: 1fr; }
+  .profile-form .primary-button { width: 100%; }
   .auth-panel { padding: 22px; }
   .topbar { min-height: 82px; padding: 16px 18px; }
   .topbar-kicker, .user-chip div { display: none; }
