@@ -149,7 +149,7 @@ export function createFinance({ api, toast, onUnauthorized }) {
       const confidence = Number(result.confianca_leitura ?? 0);
       const reviewWarning = confidence < 80 ? ' A leitura teve baixa confiança; confira tudo com atenção.' : '';
       status.className = result.aviso_categoria ? '' : 'ai-success';
-      status.textContent = `${result.aviso} Confiança da leitura: ${confidence.toFixed(0)}%.${needsReview}${reviewWarning}${result.aviso_categoria ? ` ${result.aviso_categoria}` : ''}`;
+      status.textContent = `${result.aviso} Esta movimentação ainda não foi cadastrada: confira os campos e clique em “Salvar movimentação”. Confiança da leitura: ${confidence.toFixed(0)}%.${needsReview}${reviewWarning}${result.aviso_categoria ? ` ${result.aviso_categoria}` : ''}`;
       $('#movement-ai-status').textContent = draft.categoria
         ? `IA sugeriu “${draft.categoria.nombre}” (${Number(draft.confianza_ia).toFixed(1)}%). Revise ou altere antes de salvar.`
         : 'Escolha uma categoria manualmente ou solicite a sugestão de IA.';
@@ -277,16 +277,30 @@ export function createFinance({ api, toast, onUnauthorized }) {
     $('#movement-save').disabled = true;
     $('#movement-cancel').disabled = true;
     try {
-      await api(id ? `/api/movimientos/${id}` : '/api/movimientos', {
+      const response = await api(id ? `/api/movimientos/${id}` : '/api/movimientos', {
         method: id ? 'PUT' : 'POST',
         body: JSON.stringify({ tipo: $('#movement-type').value, categoria_id: $('#movement-category').value,
           descripcion: $('#movement-description').value, valor: $('#movement-value').value,
           fecha: $('#movement-date').value, ...(aiSuggestion ?? {}) }),
       });
       if (session !== epoch) return;
+      const saved = response.movimiento;
+      const hiddenByFilters = (filters.desde && saved.fecha < filters.desde)
+        || (filters.hasta && saved.fecha > filters.hasta)
+        || (filters.tipo && saved.tipo !== filters.tipo)
+        || (filters.categoria_id && String(saved.categoria_id) !== filters.categoria_id);
+      if (hiddenByFilters) {
+        $('#filter-from').value = saved.fecha;
+        $('#filter-to').value = saved.fecha;
+        $('#filter-type').value = '';
+        categoryOptions();
+        $('#filter-category').value = '';
+        filters = readFilters();
+      }
+      page = 1;
       resetForm();
-      toast(id ? 'Movimentação atualizada.' : 'Movimentação cadastrada.');
       await refresh();
+      if (session === epoch) toast(`${id ? 'Movimentação atualizada.' : 'Movimentação cadastrada.'}${hiddenByFilters ? ` Exibindo lançamentos de ${displayDate(saved.fecha)}.` : ''}`);
     } catch (error) {
       if (session !== epoch) return;
       if (error.status === 401) { onUnauthorized(); toast('Sua sessão expirou. Entre novamente.'); return; }
