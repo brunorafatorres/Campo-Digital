@@ -90,7 +90,7 @@
             <p class="topbar-kicker">Painel do produtor</p>
             <h1 id="welcome-title">Olá!</h1>
           </div>
-          <div class="user-chip"><span id="user-initial">P</span><div><strong id="user-name">Produtor</strong><small>Produtor rural</small></div></div>
+          <div class="topbar-actions"><button id="notifications-button" class="notification-button" type="button" aria-label="Ver notificações">♢<span id="notifications-count" class="notification-badge hidden">0</span></button><div class="user-chip"><span id="user-initial">P</span><div><strong id="user-name">Produtor</strong><small>Produtor rural</small></div></div></div>
         </header>
 
         <section id="dashboard-section" class="content-section">
@@ -103,7 +103,7 @@
             <article class="summary-card expense"><span>Despesas</span><strong id="total-expense">—</strong><small>Despesas do período selecionado</small></article>
             <article class="summary-card balance"><span>Saldo</span><strong id="total-balance">—</strong><small>Receitas menos despesas</small></article>
           </div>
-          <p id="dashboard-context" role="status"></p>
+          <p id="dashboard-context" role="status"></p><section id="dashboard-notifications" class="surface dashboard-notifications hidden"><div class="list-heading"><h3>Alertas recentes</h3><button type="button" data-go="insights">Ver análises</button></div><div id="dashboard-notification-list"></div></section>
           <button class="secondary-button" type="button" data-go="movements">Ver movimentações e alterar filtros</button>
           <div class="finance-charts" aria-label="Gráficos financeiros">
             <article class="surface chart-card">
@@ -161,7 +161,10 @@
           <div class="form-layout">
             <form id="activity-form" class="surface form-card">
               <input id="activity-id" type="hidden">
-              <label class="field"><span>Nome da atividade</span><input id="activity-name" required minlength="2" maxlength="120" placeholder="Ex.: Criação de gado"></label>
+              <label class="field"><span>Nome da atividade</span><input id="activity-name" required minlength="2" maxlength="120" placeholder="Ex.: Produção de leite"></label>
+              <label class="field"><span>Tipo de atividade</span><select id="activity-type"><option value="">Selecione</option><option>Agricultura</option><option>Pecuária</option><option>Horticultura</option><option>Leite</option><option>Apicultura</option><option>Outro</option></select></label>
+              <label class="field"><span>Com o que você trabalha?</span><input id="activity-products" maxlength="180" placeholder="Ex.: soja, milho e gado leiteiro"></label>
+              <label class="field"><span>Porte da produção <small>(opcional)</small></span><select id="activity-size"><option value="">Não informar</option><option value="PEQUENA">Pequena</option><option value="MEDIA">Média</option><option value="GRANDE">Grande</option></select></label>
               <label class="field"><span>Descrição <small>(opcional)</small></span><textarea id="activity-description" maxlength="500" rows="5" placeholder="Conte um pouco sobre sua produção"></textarea></label>
               <label id="activity-active-field" class="toggle-row hidden"><input id="activity-active" type="checkbox" checked><span>Atividade ativa</span></label>
               <p id="activity-error" class="form-error" role="alert"></p>
@@ -169,6 +172,7 @@
             </form>
             <aside class="surface info-card"><span aria-hidden="true">♧</span><h3>Por que informar?</h3><p>Isso ajuda o sistema a organizar melhor suas informações e preparar recomendações adequadas à realidade da propriedade.</p></aside>
           </div>
+          <div id="activity-suggestions" class="surface suggestion-card hidden"><div><p class="eyebrow">Recomendação inteligente</p><h3>Categorias para sua produção</h3><p id="activity-suggestions-message"></p></div><div id="activity-suggestion-list" class="suggestion-list"></div><button id="activity-suggestions-save" class="primary-button fit" type="button">Adicionar selecionadas</button></div>
           <div id="activity-list" class="item-list"></div>
         </section>
 

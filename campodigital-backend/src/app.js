@@ -1,10 +1,11 @@
-import express from 'express';
+﻿import express from 'express';
 import { fileURLToPath } from 'node:url';
 
 import { createCategorySuggestionClient } from './ai/category-suggestion.client.js';
 import { createCategoryCorrectionRepository } from './ai/category-correction.repository.js';
 import { createCategorySuggestionRouter } from './ai/category-suggestion.routes.js';
 import { createCategorySuggestionService } from './ai/category-suggestion.service.js';
+import { createProductionCategoryService } from './ai/production-category.service.js';
 import { createInvoiceAnalysisService } from './ai/invoice-analysis.service.js';
 import { createActivityRepository } from './activities/activity.repository.js';
 import { createActivityRouter } from './activities/activity.routes.js';
@@ -46,6 +47,7 @@ export function createApp(overrides = {}) {
     ?? createCategorySuggestionService(categoryService, aiClient, categoryCorrectionRepository);
   const invoiceAnalysisService = overrides.invoiceAnalysisService
     ?? createInvoiceAnalysisService(aiClient, categorySuggestionService);
+  const productionCategoryService = overrides.productionCategoryService ?? createProductionCategoryService();
   const movementService = overrides.movementService
     ?? createMovementService(createMovementRepository(pool));
   const insightService = overrides.insightService
@@ -58,7 +60,7 @@ export function createApp(overrides = {}) {
   app.use('/api/auth', createAuthRouter(authService, requireAuth));
   app.use('/api/actividades', createActivityRouter(activityService, requireAuth));
   app.use('/api/categorias', createCategoryRouter(categoryService, requireAuth));
-  app.use('/api/ia', createCategorySuggestionRouter(categorySuggestionService, requireAuth, invoiceAnalysisService));
+  app.use('/api/ia', createCategorySuggestionRouter(categorySuggestionService, requireAuth, invoiceAnalysisService, productionCategoryService));
   app.use('/api/movimientos', createMovementRouter(movementService, requireAuth));
   app.use('/api/insights', createInsightRouter(insightService, requireAuth));
 
@@ -68,7 +70,7 @@ export function createApp(overrides = {}) {
   app.use((request, response) => {
     response.status(404).json({
       status: 'error',
-      message: `Rota não encontrada: ${request.method} ${request.originalUrl}`,
+      message: `Rota nÃ£o encontrada: ${request.method} ${request.originalUrl}`,
     });
   });
 
@@ -88,3 +90,5 @@ export function createApp(overrides = {}) {
 
   return app;
 }
+
+

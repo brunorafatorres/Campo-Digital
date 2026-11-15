@@ -8,6 +8,10 @@ export function createInsightRouter(service, requireAuth) {
     response.json({ insights: await service.list(request.auth.sub) });
   });
 
+  router.get('/notificacoes', async (request, response) => {
+    response.json({ notificacoes: await service.notifications(request.auth.sub) });
+  });
+
   router.get('/preferencias', async (request, response) => {
     response.json({ preferencias: await service.getPreferences(request.auth.sub) });
   });

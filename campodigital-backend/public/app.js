@@ -7,6 +7,7 @@ const state = {
   user: null,
   activities: [],
   categories: [],
+  notifications: [],
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -92,8 +93,15 @@ async function enterApp() {
   }
   $('#auth-view').classList.add('hidden');
   $('#app-view').classList.remove('hidden');
+<<<<<<< ours
   renderUser();
   const results = await Promise.allSettled([loadActivities(), loadCategories()]);
+=======
+  $('#user-name').textContent = state.user.nombre;
+  $('#user-initial').textContent = state.user.nombre.slice(0, 1).toUpperCase();
+  $('#welcome-title').textContent = `Olá, ${state.user.nombre.split(' ')[0]}!`;
+  const results = await Promise.allSettled([loadActivities(), loadCategories(), loadNotifications()]);
+>>>>>>> theirs
   if (state.token !== token) return;
   const failure = results.find((result) => result.status === 'rejected');
   if (failure) toast(failure.reason.message);
@@ -146,8 +154,13 @@ function logout() {
   insights.reset();
   state.activities = [];
   state.categories = [];
+<<<<<<< ours
   $('#profile-form').reset();
   $('#profile-error').textContent = '';
+=======
+  state.notifications = [];
+  renderNotifications();
+>>>>>>> theirs
   renderActivities();
   renderCategories();
   showSection('dashboard');
@@ -185,7 +198,7 @@ function renderActivities() {
   list.innerHTML = state.activities.map((item) => `
     <article class="activity-item">
       <span aria-hidden="true">♧</span>
-      <div><strong>${escapeHtml(item.nombre)}</strong><small>${escapeHtml(item.descripcion || 'Sem descrição')} · ${item.activa ? 'Ativa' : 'Inativa'}</small></div>
+      <div><strong>${escapeHtml(item.nombre)}</strong><small>${escapeHtml([item.tipo_producao, item.produtos_trabalhados].filter(Boolean).join(' · ') || item.descripcion || 'Sem descrição')} · ${item.activa ? 'Ativa' : 'Inativa'}</small></div>
       <button type="button" data-edit-activity="${item.id}">Editar</button>
     </article>`).join('');
 }
@@ -198,6 +211,9 @@ async function saveActivity(event) {
   const payload = {
     nombre: $('#activity-name').value,
     descripcion: $('#activity-description').value,
+    tipo_producao: $('#activity-type').value,
+    produtos_trabalhados: $('#activity-products').value,
+    porte_producao: $('#activity-size').value,
     activa: $('#activity-active').checked,
   };
   try {
@@ -210,6 +226,7 @@ async function saveActivity(event) {
     $('#activity-active').checked = true;
     $('#activity-active-field').classList.add('hidden');
     await loadActivities();
+    if (!id) { await loadProductionSuggestions({ nombre: payload.nombre, tipo_producao: payload.tipo_producao, produtos_trabalhados: payload.produtos_trabalhados, descripcion: payload.descripcion }); }
     toast(id ? 'Atividade atualizada.' : 'Atividade cadastrada.');
   } catch (requestError) {
     error.textContent = requestError.message;
@@ -222,10 +239,38 @@ function editActivity(id) {
   $('#activity-id').value = item.id;
   $('#activity-name').value = item.nombre;
   $('#activity-description').value = item.descripcion || '';
+  $('#activity-type').value = item.tipo_producao || '';
+  $('#activity-products').value = item.produtos_trabalhados || '';
+  $('#activity-size').value = item.porte_producao || '';
   $('#activity-active').checked = Boolean(item.activa);
   $('#activity-active-field').classList.remove('hidden');
   showSection('production');
   $('#activity-name').focus();
+}
+
+async function loadNotifications() {
+  const result = await api('/api/insights/notificacoes');
+  state.notifications = result.notificacoes || [];
+  renderNotifications();
+}
+
+function renderNotifications() {
+  const count = $('#notifications-count');
+  const list = $('#dashboard-notification-list');
+  const card = $('#dashboard-notifications');
+  if (!count || !list || !card) return;
+  count.textContent = String(state.notifications.length);
+  count.classList.toggle('hidden', state.notifications.length === 0);
+  card.classList.toggle('hidden', state.notifications.length === 0);
+  list.innerHTML = state.notifications.slice(0, 3).map((item) => `<p class=\"notification-item\"><strong>${escapeHtml(item.titulo)}</strong><small>${escapeHtml(item.quantidade + ' alerta(s) encontrado(s)')}</small></p>`).join('');
+}
+
+async function loadProductionSuggestions(activity) {
+  const result = await api('/api/ia/sugerir-categorias-producao', { method: 'POST', body: JSON.stringify({ atividade: activity }) });
+  const box = $('#activity-suggestions');
+  $('#activity-suggestions-message').textContent = result.mensagem;
+  $('#activity-suggestion-list').innerHTML = result.categorias.map((item, index) => `<label class=\"suggestion-option\"><input type=\"checkbox\" value=\"${escapeHtml(item.nome)}\" data-suggestion-type=\"${item.tipo}\" checked><span>${escapeHtml(item.nome)} <small>${item.tipo === 'GASTO' ? 'Despesa' : 'Receita'}</small></span></label>`).join('');
+  box.classList.remove('hidden');
 }
 
 async function loadCategories() {
@@ -310,6 +355,12 @@ $('#logout').addEventListener('click', logout);
 $('#profile-form').addEventListener('submit', saveProfile);
 $('#activity-form').addEventListener('submit', saveActivity);
 $('#category-form').addEventListener('submit', saveCategory);
+$('#notifications-button')?.addEventListener('click', () => showSection('insights'));
+$('#activity-suggestions-save')?.addEventListener('click', async () => {
+  const options = $$('#activity-suggestion-list input:checked');
+  for (const option of options) { try { await api('/api/categorias', { method: 'POST', body: JSON.stringify({ nombre: option.value, tipo: option.dataset.suggestionType }) }); } catch (error) { if (error.status !== 409) throw error; } }
+  await loadCategories(); $('#activity-suggestions').classList.add('hidden'); toast('Categorias selecionadas adicionadas.');
+});
 $('#mobile-menu').addEventListener('click', () => $('.sidebar').classList.toggle('open'));
 $$('.nav-item[data-section]').forEach((item) => item.addEventListener('click', () => showSection(item.dataset.section)));
 $$('[data-go]').forEach((item) => item.addEventListener('click', () => showSection(item.dataset.go)));

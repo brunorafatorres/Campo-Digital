@@ -34,6 +34,21 @@ const SUMMARY_SQL = `SELECT COUNT(*) AS quantidade,
 
 export function createInsightRepository(database) {
   return {
+    async notifications(userId) {
+      const [rows] = await database.execute(
+        `SELECT id, titulo, mensaje, datos_referencia,
+                DATE_FORMAT(creado_en, '%Y-%m-%dT%H:%i:%sZ') AS criado_em
+           FROM insights_financieros
+          WHERE usuario_id = ?
+          ORDER BY creado_en DESC, id DESC LIMIT 20`, [userId],
+      );
+      return rows.flatMap((row) => {
+        let reference = {};
+        try { reference = typeof row.datos_referencia === 'object' ? row.datos_referencia : JSON.parse(row.datos_referencia || '{}'); } catch { reference = {}; }
+        const alerts = [...(reference.alertas_despesas ?? []), ...(reference.movimentacoes_atipicas ?? [])];
+        return alerts.length ? [{ id: row.id, titulo: row.titulo || 'Alerta financeiro', mensagem: row.mensagem, quantidade: alerts.length, criado_em: row.criado_em }] : [];
+      });
+    },
     async getPreferences(userId) {
       const [rows] = await database.execute(
         `SELECT alertas_activas, frecuencia,

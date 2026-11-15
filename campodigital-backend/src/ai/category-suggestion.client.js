@@ -1,4 +1,4 @@
-export function createCategorySuggestionClient({ baseUrl, timeoutMs, fetchImpl = fetch }) {
+export function createCategorySuggestionClient({ baseUrl, timeoutMs, invoiceTimeoutMs = timeoutMs, fetchImpl = fetch }) {
   return {
     async suggest(payload) {
       const controller = new AbortController();
@@ -24,7 +24,7 @@ export function createCategorySuggestionClient({ baseUrl, timeoutMs, fetchImpl =
 
     async readInvoice(image, contentType) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      const timeout = setTimeout(() => controller.abort(), invoiceTimeoutMs);
       try {
         const response = await fetchImpl(`${baseUrl}/read-invoice`, {
           method: 'POST',

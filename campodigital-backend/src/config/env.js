@@ -48,5 +48,6 @@ export const env = Object.freeze({
   ai: Object.freeze({
     baseUrl: readOptional('AI_SERVICE_URL', 'http://127.0.0.1:8001'),
     timeoutMs: readInteger('AI_TIMEOUT_MS', 2_500),
+    invoiceTimeoutMs: readInteger('AI_INVOICE_TIMEOUT_MS', 30_000),
   }),
 });

@@ -1,11 +1,16 @@
-import express, { Router } from 'express';
+﻿import express, { Router } from 'express';
 
-export function createCategorySuggestionRouter(service, requireAuth, invoiceAnalysisService = null) {
+export function createCategorySuggestionRouter(service, requireAuth, invoiceAnalysisService = null, productionCategoryService = null) {
   const router = Router();
   router.use(requireAuth);
   router.post('/sugerir-categoria', async (request, response) => {
     response.json(await service.suggest(request.auth.sub, request.body));
   });
+  if (productionCategoryService) {
+    router.post('/sugerir-categorias-producao', async (request, response) => {
+      response.json(productionCategoryService.suggest(request.body?.atividade ?? request.body ?? {}));
+    });
+  }
   if (invoiceAnalysisService) {
     router.post('/analisar-comprovante', express.raw({
       type: ['image/jpeg', 'image/png', 'image/webp'],

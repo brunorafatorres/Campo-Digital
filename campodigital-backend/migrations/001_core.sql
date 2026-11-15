@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS actividades_productivas (
   usuario_id BIGINT UNSIGNED NOT NULL,
   nombre VARCHAR(120) NOT NULL,
   descripcion VARCHAR(500) NULL,
+  tipo_producao VARCHAR(80) NULL,
+  produtos_trabalhados VARCHAR(180) NULL,
+  porte_producao ENUM('PEQUENA', 'MEDIA', 'GRANDE') NULL,
   activa BOOLEAN NOT NULL DEFAULT TRUE,
   creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -214,6 +217,16 @@ SET @sql = IF(
 PREPARE migration_statement FROM @sql;
 EXECUTE migration_statement;
 DEALLOCATE PREPARE migration_statement;
+
+SET @has_production_type = (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = @schema_name AND TABLE_NAME = 'actividades_productivas' AND COLUMN_NAME = 'tipo_producao');
+SET @sql = IF(@has_production_type = 0, 'ALTER TABLE actividades_productivas ADD COLUMN tipo_producao VARCHAR(80) NULL AFTER descripcion', 'SELECT 1');
+PREPARE migration_statement FROM @sql; EXECUTE migration_statement; DEALLOCATE PREPARE migration_statement;
+SET @has_products = (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = @schema_name AND TABLE_NAME = 'actividades_productivas' AND COLUMN_NAME = 'produtos_trabalhados');
+SET @sql = IF(@has_products = 0, 'ALTER TABLE actividades_productivas ADD COLUMN produtos_trabalhados VARCHAR(180) NULL AFTER tipo_producao', 'SELECT 1');
+PREPARE migration_statement FROM @sql; EXECUTE migration_statement; DEALLOCATE PREPARE migration_statement;
+SET @has_production_size = (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = @schema_name AND TABLE_NAME = 'actividades_productivas' AND COLUMN_NAME = 'porte_producao');
+SET @sql = IF(@has_production_size = 0, 'ALTER TABLE actividades_productivas ADD COLUMN porte_producao ENUM(''PEQUENA'', ''MEDIA'', ''GRANDE'') NULL AFTER produtos_trabalhados', 'SELECT 1');
+PREPARE migration_statement FROM @sql; EXECUTE migration_statement; DEALLOCATE PREPARE migration_statement;
 
 SET @has_system_flag = (
   SELECT COUNT(*) FROM information_schema.COLUMNS

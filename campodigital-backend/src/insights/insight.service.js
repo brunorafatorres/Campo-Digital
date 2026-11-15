@@ -173,6 +173,10 @@ export function createInsightService(repository) {
       return repository.listByUser(userId);
     },
 
+    notifications(userId) {
+      return repository.notifications(userId);
+    },
+
     getPreferences(userId) {
       return repository.getPreferences(userId);
     },

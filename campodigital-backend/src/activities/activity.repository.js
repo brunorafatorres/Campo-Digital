@@ -2,7 +2,7 @@ export function createActivityRepository(database) {
   return {
     async listByUser(userId) {
       const [rows] = await database.execute(
-        `SELECT id, nombre, descripcion, activa, creado_en, actualizado_en
+        `SELECT id, nombre, descripcion, tipo_producao, produtos_trabalhados, porte_producao, activa, creado_en, actualizado_en
            FROM actividades_productivas
           WHERE usuario_id = ?
           ORDER BY activa DESC, nombre ASC`,
@@ -13,16 +13,16 @@ export function createActivityRepository(database) {
 
     async create(userId, data) {
       const [result] = await database.execute(
-        `INSERT INTO actividades_productivas (usuario_id, nombre, descripcion)
-         VALUES (?, ?, ?)`,
-        [userId, data.nombre, data.descripcion],
+        `INSERT INTO actividades_productivas (usuario_id, nombre, descripcion, tipo_producao, produtos_trabalhados, porte_producao)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [userId, data.nombre, data.descripcion, data.tipo_producao, data.produtos_trabalhados, data.porte_producao],
       );
       return this.findById(userId, result.insertId);
     },
 
     async findById(userId, id) {
       const [rows] = await database.execute(
-        `SELECT id, nombre, descripcion, activa, creado_en, actualizado_en
+        `SELECT id, nombre, descripcion, tipo_producao, produtos_trabalhados, porte_producao, activa, creado_en, actualizado_en
            FROM actividades_productivas
           WHERE id = ? AND usuario_id = ?
           LIMIT 1`,
@@ -34,9 +34,9 @@ export function createActivityRepository(database) {
     async update(userId, id, data) {
       const [result] = await database.execute(
         `UPDATE actividades_productivas
-            SET nombre = ?, descripcion = ?, activa = ?
+            SET nombre = ?, descripcion = ?, tipo_producao = ?, produtos_trabalhados = ?, porte_producao = ?, activa = ?
           WHERE id = ? AND usuario_id = ?`,
-        [data.nombre, data.descripcion, data.activa, id, userId],
+        [data.nombre, data.descripcion, data.tipo_producao, data.produtos_trabalhados, data.porte_producao, data.activa, id, userId],
       );
       return result.affectedRows ? this.findById(userId, id) : null;
     },
