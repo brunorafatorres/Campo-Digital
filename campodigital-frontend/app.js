@@ -275,15 +275,29 @@ async function suggestCategoriesForProduction() {
       method: 'POST',
       body: JSON.stringify({ atividade: activity }),
     });
-    const existing = new Set(state.categories.map((item) => `${item.tipo}:${item.nombre.toLocaleLowerCase('pt-BR')}`));
-    const suggestions = (result.categorias || []).filter((item) => !existing.has(`${item.tipo}:${item.nombre.toLocaleLowerCase('pt-BR')}`));
+    const categoryKey = (item) => {
+      const name = typeof item?.nombre === 'string' ? item.nombre.trim() : '';
+      const type = typeof item?.tipo === 'string' ? item.tipo.trim().toUpperCase() : '';
+      return name && ['INGRESO', 'GASTO'].includes(type)
+        ? `${type}:${name.toLocaleLowerCase('pt-BR')}`
+        : null;
+    };
+    const existing = new Set(state.categories.map(categoryKey).filter(Boolean));
+    const suggestions = (Array.isArray(result.categorias) ? result.categorias : []).filter((item) => {
+      const key = categoryKey(item);
+      return key && !existing.has(key);
+    });
     $('#category-suggestion-list').innerHTML = suggestions.map((item) => `
       <label class="suggestion-option">
         <input type="checkbox" value="${escapeHtml(item.nombre)}" data-suggestion-type="${escapeHtml(item.tipo)}" checked>
         <span>${escapeHtml(item.nombre)} <small>${item.tipo === 'GASTO' ? 'Despesa' : 'Receita'}</small></span>
       </label>`).join('');
     $('#category-suggestions-save').classList.toggle('hidden', suggestions.length === 0);
-    status.textContent = suggestions.length ? result.mensagem : 'As sugestões para essa produção já estão cadastradas.';
+    status.textContent = suggestions.length
+      ? (typeof result.mensagem === 'string' && result.mensagem.trim()
+        ? result.mensagem
+        : 'Revise as sugestões antes de adicioná-las às suas categorias.')
+      : 'As sugestões para essa produção já estão cadastradas.';
   } catch (error) {
     status.textContent = error.message;
   } finally {
