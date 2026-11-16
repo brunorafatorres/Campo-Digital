@@ -118,22 +118,6 @@
               <div id="period-chart" class="period-chart" role="list"></div>
             </article>
           </div>
-          <div class="dashboard-grid">
-            <article class="surface getting-started">
-              <div><p class="eyebrow">Primeiros passos</p><h3>Prepare sua conta</h3></div>
-              <ol>
-                <li id="step-account" class="done"><span>✓</span><div><strong>Conta criada</strong><small>Seu acesso já está protegido.</small></div></li>
-                <li id="step-activity"><span>2</span><div><strong>Cadastre sua produção</strong><small>Informe sua principal atividade rural.</small></div><button data-go="production">Cadastrar</button></li>
-                <li id="step-category"><span>3</span><div><strong>Organize as categorias</strong><small>Crie categorias que combinam com seu negócio.</small></div><button data-go="categories">Organizar</button></li>
-              </ol>
-            </article>
-            <article class="surface support-card">
-              <span class="support-icon" aria-hidden="true">?</span>
-              <h3>Precisa de ajuda?</h3>
-              <p>Use os textos simples de cada tela para completar seu cadastro.</p>
-              <small>Versão inicial do TCC CampoDigital</small>
-            </article>
-          </div>
         </section>
 
         <section id="profile-section" class="content-section hidden">
@@ -185,6 +169,14 @@
             <button class="primary-button fit" type="submit">Adicionar categoria</button>
             <p id="category-error" class="form-error" role="alert"></p>
           </form>
+          <div class="surface suggestion-card category-ai-card">
+            <div><p class="eyebrow">Recomendação para sua produção</p><h3>Sugerir novas categorias</h3><p>Descreva o que você produz. Se deixar o campo vazio, usaremos as atividades do seu perfil produtivo.</p></div>
+            <label class="field"><span>Descrição da produção</span><textarea id="category-production-description" maxlength="500" rows="3" placeholder="Ex.: cultivo de morangos, produção de geleias e venda na feira"></textarea></label>
+            <div class="button-row"><button id="category-suggest-production" class="secondary-button" type="button">Sugerir categorias</button></div>
+            <p id="category-ai-status" role="status" aria-live="polite">As sugestões podem ser revisadas antes de adicionar.</p>
+            <div id="category-suggestion-list" class="suggestion-list"></div>
+            <button id="category-suggestions-save" class="primary-button fit hidden" type="button">Adicionar selecionadas</button>
+          </div>
           <div class="category-columns">
             <section><div class="list-heading"><h3>Receitas</h3><span id="income-count">0</span></div><div id="income-categories" class="category-list"></div></section>
             <section><div class="list-heading"><h3>Despesas</h3><span id="expense-count">0</span></div><div id="expense-categories" class="category-list"></div></section>

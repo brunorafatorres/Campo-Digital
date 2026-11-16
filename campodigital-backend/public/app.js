@@ -180,7 +180,6 @@ async function loadActivities() {
 
 function renderActivities() {
   const list = $('#activity-list');
-  $('#step-activity').classList.toggle('done', state.activities.length > 0);
   if (!state.activities.length) {
     list.innerHTML = '<div class="empty-state">Nenhuma atividade cadastrada ainda.</div>';
     return;
@@ -266,6 +265,96 @@ async function loadProductionSuggestions(activity) {
   box.classList.remove('hidden');
 }
 
+function productionDescriptionForSuggestions() {
+  const description = $('#category-production-description').value.trim();
+  if (description) {
+    return { nombre: description, descripcion: description, produtos_trabalhados: description };
+  }
+  const activities = state.activities.filter((item) => item.activa !== false);
+  if (!activities.length) return null;
+  return {
+    nombre: activities.map((item) => item.nombre).join(' '),
+    tipo_producao: activities.map((item) => item.tipo_producao).filter(Boolean).join(' '),
+    produtos_trabalhados: activities.map((item) => item.produtos_trabalhados).filter(Boolean).join(' '),
+    descripcion: activities.map((item) => item.descripcion).filter(Boolean).join(' '),
+  };
+}
+
+async function suggestCategoriesForProduction() {
+  const status = $('#category-ai-status');
+  const button = $('#category-suggest-production');
+  const activity = productionDescriptionForSuggestions();
+  status.textContent = '';
+  if (!activity || ![activity.nombre, activity.tipo_producao, activity.produtos_trabalhados, activity.descripcion].some((value) => String(value || '').trim())) {
+    status.textContent = 'Descreva sua produção acima ou cadastre uma atividade no perfil produtivo.';
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = 'Analisando a descrição da produção…';
+  try {
+    const result = await api('/api/ia/sugerir-categorias-producao', {
+      method: 'POST',
+      body: JSON.stringify({ atividade: activity }),
+    });
+    const categoryKey = (item) => {
+      const name = typeof item?.nombre === 'string' ? item.nombre.trim() : '';
+      const type = typeof item?.tipo === 'string' ? item.tipo.trim().toUpperCase() : '';
+      return name && ['INGRESO', 'GASTO'].includes(type)
+        ? `${type}:${name.toLocaleLowerCase('pt-BR')}`
+        : null;
+    };
+    const existing = new Set(state.categories.map(categoryKey).filter(Boolean));
+    const suggestions = (Array.isArray(result.categorias) ? result.categorias : []).filter((item) => {
+      const key = categoryKey(item);
+      return key && !existing.has(key);
+    });
+    $('#category-suggestion-list').innerHTML = suggestions.map((item) => `
+      <label class="suggestion-option">
+        <input type="checkbox" value="${escapeHtml(item.nombre)}" data-suggestion-type="${escapeHtml(item.tipo)}" checked>
+        <span>${escapeHtml(item.nombre)} <small>${item.tipo === 'GASTO' ? 'Despesa' : 'Receita'}</small></span>
+      </label>`).join('');
+    $('#category-suggestions-save').classList.toggle('hidden', suggestions.length === 0);
+    status.textContent = suggestions.length
+      ? (typeof result.mensagem === 'string' && result.mensagem.trim()
+        ? result.mensagem
+        : 'Revise as sugestões antes de adicioná-las às suas categorias.')
+      : 'As sugestões para essa produção já estão cadastradas.';
+  } catch (error) {
+    status.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function saveCategorySuggestions() {
+  const button = $('#category-suggestions-save');
+  const selected = $('#category-suggestion-list input:checked');
+  if (!selected.length) return;
+  button.disabled = true;
+  try {
+    for (const option of selected) {
+      try {
+        await api('/api/categorias', {
+          method: 'POST',
+          body: JSON.stringify({ nombre: option.value, tipo: option.dataset.suggestionType }),
+        });
+      } catch (error) {
+        if (error.status !== 409) throw error;
+      }
+    }
+    await loadCategories();
+    $('#category-suggestion-list').innerHTML = '';
+    button.classList.add('hidden');
+    $('#category-ai-status').textContent = 'Categorias selecionadas adicionadas ao seu perfil financeiro.';
+    toast('Categorias sugeridas adicionadas.');
+  } catch (error) {
+    $('#category-ai-status').textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function loadCategories() {
   const token = state.token;
   const result = await api('/api/categorias?incluir_inativas=true');
@@ -280,7 +369,6 @@ function renderCategories() {
   const expenses = state.categories.filter((item) => item.tipo === 'GASTO');
   $('#income-count').textContent = incomes.length;
   $('#expense-count').textContent = expenses.length;
-  $('#step-category').classList.toggle('done', state.categories.some((item) => item.origen === 'PROPIA'));
   renderCategoryList($('#income-categories'), incomes, 'income');
   renderCategoryList($('#expense-categories'), expenses, 'expense');
 }
@@ -348,7 +436,9 @@ $('#logout').addEventListener('click', logout);
 $('#profile-form').addEventListener('submit', saveProfile);
 $('#activity-form').addEventListener('submit', saveActivity);
 $('#category-form').addEventListener('submit', saveCategory);
-$('#notifications-button')?.addEventListener('click', () => showSection('alerts')); });
+$('#category-suggest-production').addEventListener('click', suggestCategoriesForProduction);
+$('#category-suggestions-save').addEventListener('click', saveCategorySuggestions);
+$('#notifications-button')?.addEventListener('click', () => showSection('alerts'));
 $('#activity-suggestions-save')?.addEventListener('click', async () => {
   const options = $$('#activity-suggestion-list input:checked');
   for (const option of options) { try { await api('/api/categorias', { method: 'POST', body: JSON.stringify({ nombre: option.value, tipo: option.dataset.suggestionType }) }); } catch (error) { if (error.status !== 409) throw error; } }

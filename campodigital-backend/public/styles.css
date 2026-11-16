@@ -321,3 +321,36 @@ button:focus-visible { outline: 2px solid var(--forest-2); outline-offset: 3px; 
 }
 .topbar-actions{display:flex;align-items:center;gap:16px}.notification-button{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px 13px;color:var(--forest);background:white;font-size:18px}.notification-badge{position:absolute;top:-6px;right:-6px;display:grid;place-items:center;min-width:20px;height:20px;border-radius:999px;color:white;background:var(--danger);font-size:11px;font-weight:800}.dashboard-notifications{margin-top:18px;padding:20px}.dashboard-notifications .list-heading button{border:0;color:var(--forest-2);background:transparent;font-weight:800}.notification-item{display:grid;gap:4px;margin:0;padding:10px 0;border-top:1px solid var(--line)}.notification-item small{color:var(--muted)}.suggestion-card{display:grid;gap:16px;margin-top:18px;padding:24px}.suggestion-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.suggestion-option{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.suggestion-option span{display:grid;gap:3px;font-weight:700}.suggestion-option small{color:var(--muted);font-weight:500}
 .alerts-page{padding:26px}.notification-list{display:grid;gap:12px}.notification-item{display:grid;gap:5px;padding:16px;border:1px solid var(--line);border-radius:14px;background:white}.notification-item p{margin:4px 0 0;color:var(--muted);line-height:1.5}.notification-item small{color:var(--muted)}
+
+/* Cartão de recomendações na tela Categorias */
+.category-ai-card {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 26px;
+}
+
+.category-ai-card .eyebrow { margin-bottom: 8px; }
+.category-ai-card > div:first-child > p:last-child {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.category-ai-card > .field { margin: 0; }
+.category-ai-card .button-row { margin-top: 0; }
+.category-ai-card #category-ai-status {
+  min-height: 20px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.category-ai-card #category-ai-status:empty,
+.category-ai-card .suggestion-list:empty { display: none; }
+.category-ai-card > .primary-button.fit { justify-self: start; }
+
+@media (max-width: 620px) {
+  .category-ai-card { padding: 20px; }
+  .category-ai-card .button-row > button,
+  .category-ai-card > .primary-button.fit { width: 100%; }
+}

@@ -18,6 +18,18 @@ API inicial do MVP de gestão financeira para produtores rurais.
 
 O usuário `campodigital` fica limitado ao banco do projeto. Não utilize a conta `root` para executar normalmente a API.
 
+## Dados de demonstração
+
+Use uma conta exclusiva para demonstração. O seed cria uma atividade, categorias, movimentações e um alerta para esse usuário.
+
+No PowerShell, informe o e-mail da conta cadastrada e execute:
+
+```powershell
+$env:DEMO_EMAIL = "demo@example.com"
+npm run db:seed:demo
+Remove-Item Env:DEMO_EMAIL
+```
+
 ## Endpoints disponíveis
 
 - `GET /health`: confirma que a API está ativa.

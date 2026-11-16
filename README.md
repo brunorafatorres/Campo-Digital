@@ -12,6 +12,9 @@ Sistema web de gestão financeira para produtores rurais, desenvolvido como TCC.
 - Totais de receitas, despesas e saldo no painel.
 - Gráficos financeiros por categoria e por mês.
 - Sugestão de categoria por um serviço auxiliar em Python e TensorFlow.
+- Perfil produtivo com sugestões de categorias relacionadas às atividades informadas.
+- Leitura de comprovantes por foto, com dados extraídos apresentados como rascunho para revisão.
+- Análises financeiras, histórico de resultados e alertas para o produtor.
 
 ## Como executar
 
@@ -40,6 +43,8 @@ npm test
 
 Os testes automatizados usam dados isolados em memória. A configuração e a persistência no MySQL devem ser conferidas no ambiente local conforme o roteiro do backend.
 
-## Próximas etapas
+## Pendências para a versão final
 
-Ampliar os dados de treinamento, utilizar as correções dos produtores e implementar análises e insights financeiros.
+- Executar e registrar `npm run check`, `npm test` e os testes manuais com MySQL.
+- Avaliar a IA com dados documentados e registrar resultados e limitações; o conjunto atual é sintético e inicial.
+- Atualizar o texto do TCC para refletir o escopo financeiro, as funcionalidades implementadas e as evidências obtidas.

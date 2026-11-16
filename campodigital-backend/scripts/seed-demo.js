@@ -37,18 +37,6 @@ try {
   }
 
   const userId = users[0].id;
-  await connection.execute(
-    `UPDATE usuarios
-        SET nombre = ?, telefone = ?, nome_propriedade = ?, localidade = ?
-      WHERE id = ?`,
-    [
-      'Bruno Rafael Rodrigues Torres',
-      '(55) 99999-9999',
-      'S\u00edtio Campo Digital',
-      'Rivera - Uruguai',
-      userId,
-    ],
-  );
 
   const [activities] = await connection.execute(
     `SELECT id FROM actividades_productivas
