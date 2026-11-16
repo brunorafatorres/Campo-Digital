@@ -275,18 +275,28 @@ async function suggestCategoriesForProduction() {
       method: 'POST',
       body: JSON.stringify({ atividade: activity }),
     });
+    const categoryName = (item) => {
+      const value = typeof item?.nome === 'string' ? item.nome : item?.nombre;
+      return typeof value === 'string' ? value.trim() : '';
+    };
     const categoryKey = (item) => {
-      const name = typeof item?.nombre === 'string' ? item.nombre.trim() : '';
+      const name = categoryName(item);
       const type = typeof item?.tipo === 'string' ? item.tipo.trim().toUpperCase() : '';
       return name && ['INGRESO', 'GASTO'].includes(type)
         ? `${type}:${name.toLocaleLowerCase('pt-BR')}`
         : null;
     };
     const existing = new Set(state.categories.map(categoryKey).filter(Boolean));
-    const suggestions = (Array.isArray(result.categorias) ? result.categorias : []).filter((item) => {
-      const key = categoryKey(item);
-      return key && !existing.has(key);
-    });
+    const suggestions = (Array.isArray(result.categorias) ? result.categorias : [])
+      .map((item) => ({
+        ...(item ?? {}),
+        nombre: categoryName(item),
+        tipo: typeof item?.tipo === 'string' ? item.tipo.trim().toUpperCase() : '',
+      }))
+      .filter((item) => {
+        const key = categoryKey(item);
+        return key && !existing.has(key);
+      });
     $('#category-suggestion-list').innerHTML = suggestions.map((item) => `
       <label class="suggestion-option">
         <input type="checkbox" value="${escapeHtml(item.nombre)}" data-suggestion-type="${escapeHtml(item.tipo)}" checked>
