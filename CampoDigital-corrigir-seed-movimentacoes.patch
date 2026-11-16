@@ -1,0 +1,15 @@
+diff --git a/campodigital-backend/scripts/seed-demo.js b/campodigital-backend/scripts/seed-demo.js
+--- a/campodigital-backend/scripts/seed-demo.js
++++ b/campodigital-backend/scripts/seed-demo.js
+@@ -117,10 +117,10 @@
+ 
+     await connection.execute(
+       `INSERT INTO movimientos_financieros
+-        (usuario_id, actividad_productiva_id, categoria_id, tipo, valor, fecha, descripcion)
+-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+-      [userId, activityId, categoryId, type, value, date, description],
++        (usuario_id, categoria_id, tipo, valor, fecha, descripcion)
++       VALUES (?, ?, ?, ?, ?, ?)`,
++      [userId, categoryId, type, value, date, description],
+     );
+   }

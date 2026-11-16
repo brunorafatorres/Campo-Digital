@@ -1,0 +1,36 @@
+diff --git a/campodigital-backend/public/app.js b/campodigital-backend/public/app.js
+--- a/campodigital-backend/public/app.js
++++ b/campodigital-backend/public/app.js
+@@ -94,13 +94,6 @@ async function enterApp() {
+   $('#auth-view').classList.add('hidden');
+   $('#app-view').classList.remove('hidden');
+-<<<<<<< ours
+-  renderUser();
+-  const results = await Promise.allSettled([loadActivities(), loadCategories()]);
+-=======
+-  $('#user-name').textContent = state.user.nombre;
+-  $('#user-initial').textContent = state.user.nombre.slice(0, 1).toUpperCase();
+-  $('#welcome-title').textContent = `Olá, ${state.user.nombre.split(' ')[0]}!`;
+-  const results = await Promise.allSettled([loadActivities(), loadCategories(), loadNotifications()]);
+->>>>>>> theirs
++  renderUser();
++  const results = await Promise.allSettled([loadActivities(), loadCategories(), loadNotifications()]);
+   if (state.token !== token) return;
+   const failure = results.find((result) => result.status === 'rejected');
+@@ -156,10 +149,7 @@ function logout() {
+   insights.reset();
+   state.activities = [];
+   state.categories = [];
+-<<<<<<< ours
+-  $('#profile-form').reset();
+-  $('#profile-error').textContent = '';
+-=======
+-  state.notifications = [];
+-  renderNotifications();
+->>>>>>> theirs
++  $('#profile-form').reset();
++  $('#profile-error').textContent = '';
++  state.notifications = [];
++  renderNotifications();
+   renderActivities();
+   renderCategories();

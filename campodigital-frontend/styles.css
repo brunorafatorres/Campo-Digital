@@ -354,3 +354,4 @@ button:focus-visible { outline: 2px solid var(--forest-2); outline-offset: 3px; 
   .chart-heading { display: grid; }
   .chart-legend { justify-content: flex-start; }
 }
+.alerts-page{padding:26px}.notification-list{display:grid;gap:12px}.notification-item{display:grid;gap:5px;padding:16px;border:1px solid var(--line);border-radius:14px;background:white}.notification-item p{margin:4px 0 0;color:var(--muted);line-height:1.5}.notification-item small{color:var(--muted)}

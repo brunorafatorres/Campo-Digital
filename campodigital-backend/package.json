@@ -1,25 +1,24 @@
 ﻿{
-  "name": "campodigital-backend",
-  "version": "0.1.0",
-  "private": true,
-  "description": "API backend do MVP financeiro CampoDigital.",
-  "type": "module",
-  "engines": {
-    "node": ">=22"
-  },
-  "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
-    "db:migrate": "node src/database/migrate.js",
-    "db:check": "node src/database/check-schema.js",
-    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/database/pool.js && node --check src/database/migrate.js && node --check src/database/check-schema.js && node --check src/routes/health.routes.js && node --check src/auth/auth.routes.js && node --check src/auth/auth.service.js && node --check src/auth/auth.repository.js && node --check src/auth/password.js && node --check src/auth/token.js && node --check src/auth/require-auth.js && node --check src/activities/activity.routes.js && node --check src/activities/activity.service.js && node --check src/activities/activity.repository.js && node --check src/categories/category.routes.js && node --check src/categories/category.service.js && node --check src/categories/category.repository.js && node --check src/ai/category-key.js && node --check src/ai/category-correction.repository.js && node --check src/ai/category-suggestion.client.js && node --check src/ai/category-suggestion.service.js && node --check src/ai/production-category.service.js && node --check src/ai/category-suggestion.routes.js && node --check src/insights/insight.routes.js && node --check src/insights/insight.service.js && node --check src/insights/insight.repository.js && node --check public/app.js && node --check src/movements/movement.routes.js && node --check src/movements/movement.service.js && node --check src/movements/movement.repository.js && node --check public/finance.js && node --check public/insights.js && node --check ../campodigital-frontend/app.js && node --check ../campodigital-frontend/finance.js && node --check ../campodigital-frontend/insights.js",
-    "test": "node --test"
-  },
-  "dependencies": {
-    "dotenv": "^16.6.1",
-    "express": "^5.1.0",
-    "mysql2": "^3.14.3"
-  }
+    "name":  "campodigital-backend",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "API backend do MVP financeiro CampoDigital.",
+    "type":  "module",
+    "engines":  {
+                    "node":  "\u003e=22"
+                },
+    "scripts":  {
+                    "dev":  "node --watch src/server.js",
+                    "start":  "node src/server.js",
+                    "db:migrate":  "node src/database/migrate.js",
+                    "db:check":  "node src/database/check-schema.js",
+                    "check":  "node --check src/server.js \u0026\u0026 node --check src/app.js \u0026\u0026 node --check src/config/env.js \u0026\u0026 node --check src/database/pool.js \u0026\u0026 node --check src/database/migrate.js \u0026\u0026 node --check src/database/check-schema.js \u0026\u0026 node --check src/routes/health.routes.js \u0026\u0026 node --check src/auth/auth.routes.js \u0026\u0026 node --check src/auth/auth.service.js \u0026\u0026 node --check src/auth/auth.repository.js \u0026\u0026 node --check src/auth/password.js \u0026\u0026 node --check src/auth/token.js \u0026\u0026 node --check src/auth/require-auth.js \u0026\u0026 node --check src/activities/activity.routes.js \u0026\u0026 node --check src/activities/activity.service.js \u0026\u0026 node --check src/activities/activity.repository.js \u0026\u0026 node --check src/categories/category.routes.js \u0026\u0026 node --check src/categories/category.service.js \u0026\u0026 node --check src/categories/category.repository.js \u0026\u0026 node --check src/ai/category-key.js \u0026\u0026 node --check src/ai/category-correction.repository.js \u0026\u0026 node --check src/ai/category-suggestion.client.js \u0026\u0026 node --check src/ai/category-suggestion.service.js \u0026\u0026 node --check src/ai/production-category.service.js \u0026\u0026 node --check src/ai/category-suggestion.routes.js \u0026\u0026 node --check src/insights/insight.routes.js \u0026\u0026 node --check src/insights/insight.service.js \u0026\u0026 node --check src/insights/insight.repository.js \u0026\u0026 node --check public/app.js \u0026\u0026 node --check src/movements/movement.routes.js \u0026\u0026 node --check src/movements/movement.service.js \u0026\u0026 node --check src/movements/movement.repository.js \u0026\u0026 node --check public/finance.js \u0026\u0026 node --check public/insights.js \u0026\u0026 node --check ../campodigital-frontend/app.js \u0026\u0026 node --check ../campodigital-frontend/finance.js \u0026\u0026 node --check ../campodigital-frontend/insights.js",
+                    "test":  "node --test",
+                    "db:seed:demo":  "node scripts/seed-demo.js"
+                },
+    "dependencies":  {
+                         "dotenv":  "^16.6.1",
+                         "express":  "^5.1.0",
+                         "mysql2":  "^3.14.3"
+                     }
 }
-
-

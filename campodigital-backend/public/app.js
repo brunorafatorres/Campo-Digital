@@ -93,15 +93,8 @@ async function enterApp() {
   }
   $('#auth-view').classList.add('hidden');
   $('#app-view').classList.remove('hidden');
-<<<<<<< ours
   renderUser();
-  const results = await Promise.allSettled([loadActivities(), loadCategories()]);
-=======
-  $('#user-name').textContent = state.user.nombre;
-  $('#user-initial').textContent = state.user.nombre.slice(0, 1).toUpperCase();
-  $('#welcome-title').textContent = `Olá, ${state.user.nombre.split(' ')[0]}!`;
   const results = await Promise.allSettled([loadActivities(), loadCategories(), loadNotifications()]);
->>>>>>> theirs
   if (state.token !== token) return;
   const failure = results.find((result) => result.status === 'rejected');
   if (failure) toast(failure.reason.message);
@@ -154,13 +147,10 @@ function logout() {
   insights.reset();
   state.activities = [];
   state.categories = [];
-<<<<<<< ours
   $('#profile-form').reset();
   $('#profile-error').textContent = '';
-=======
   state.notifications = [];
   renderNotifications();
->>>>>>> theirs
   renderActivities();
   renderCategories();
   showSection('dashboard');
@@ -257,12 +247,15 @@ async function loadNotifications() {
 function renderNotifications() {
   const count = $('#notifications-count');
   const list = $('#dashboard-notification-list');
+  const alertsList = $('#alerts-list');
   const card = $('#dashboard-notifications');
   if (!count || !list || !card) return;
   count.textContent = String(state.notifications.length);
   count.classList.toggle('hidden', state.notifications.length === 0);
   card.classList.toggle('hidden', state.notifications.length === 0);
+  const html = state.notifications.map((item) => `<article class=\"notification-item\"><strong>${escapeHtml(item.titulo)}</strong><small>${escapeHtml(item.quantidade + ' alerta(s) encontrado(s)')} · ${escapeHtml(item.criado_em || '')}</small><p>${escapeHtml(item.mensagem || '')}</p></article>`).join('');
   list.innerHTML = state.notifications.slice(0, 3).map((item) => `<p class=\"notification-item\"><strong>${escapeHtml(item.titulo)}</strong><small>${escapeHtml(item.quantidade + ' alerta(s) encontrado(s)')}</small></p>`).join('');
+  if (alertsList) alertsList.innerHTML = html || '<p class=\"empty-state\">Nenhum alerta registrado.</p>';
 }
 
 async function loadProductionSuggestions(activity) {
@@ -355,7 +348,7 @@ $('#logout').addEventListener('click', logout);
 $('#profile-form').addEventListener('submit', saveProfile);
 $('#activity-form').addEventListener('submit', saveActivity);
 $('#category-form').addEventListener('submit', saveCategory);
-$('#notifications-button')?.addEventListener('click', () => showSection('insights'));
+$('#notifications-button')?.addEventListener('click', () => showSection('alerts')); });
 $('#activity-suggestions-save')?.addEventListener('click', async () => {
   const options = $$('#activity-suggestion-list input:checked');
   for (const option of options) { try { await api('/api/categorias', { method: 'POST', body: JSON.stringify({ nombre: option.value, tipo: option.dataset.suggestionType }) }); } catch (error) { if (error.status !== 409) throw error; } }
@@ -376,3 +369,5 @@ $('.category-columns').addEventListener('click', (event) => {
 if (state.token) {
   enterApp().catch(() => logout());
 }
+
+
