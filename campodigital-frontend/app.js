@@ -245,16 +245,28 @@ function renderNotifications() {
 
 function productionDescriptionForSuggestions() {
   const description = $('#category-production-description').value.trim();
-  if (description) {
-    return { nombre: description, descripcion: description, produtos_trabalhados: description };
-  }
   const activities = state.activities.filter((item) => item.activa !== false);
-  if (!activities.length) return null;
+  const profileFields = [
+    state.user?.nome_propriedade,
+    state.user?.localidade,
+    state.user?.atividade_principal,
+    state.user?.tipo_producao,
+    state.user?.produtos_trabalhados,
+    state.user?.descricao_producao,
+  ].filter((value) => typeof value === 'string' && value.trim());
+  const activityFields = activities.flatMap((item) => [
+    item.nombre,
+    item.tipo_producao,
+    item.produtos_trabalhados,
+    item.descripcion,
+  ]).filter((value) => typeof value === 'string' && value.trim());
+  const context = [description, ...profileFields, ...activityFields].join(' ').trim();
+  if (!context) return null;
   return {
-    nombre: activities.map((item) => item.nombre).join(' '),
-    tipo_producao: activities.map((item) => item.tipo_producao).filter(Boolean).join(' '),
-    produtos_trabalhados: activities.map((item) => item.produtos_trabalhados).filter(Boolean).join(' '),
-    descripcion: activities.map((item) => item.descripcion).filter(Boolean).join(' '),
+    nombre: context,
+    tipo_producao: [...profileFields, ...activities.map((item) => item.tipo_producao).filter(Boolean)].join(' '),
+    produtos_trabalhados: [...profileFields, ...activities.map((item) => item.produtos_trabalhados).filter(Boolean)].join(' '),
+    descripcion: context,
   };
 }
 
@@ -283,7 +295,7 @@ async function suggestCategoriesForProduction() {
       const name = categoryName(item);
       const type = typeof item?.tipo === 'string' ? item.tipo.trim().toUpperCase() : '';
       return name && ['INGRESO', 'GASTO'].includes(type)
-        ? `${type}:${name.toLocaleLowerCase('pt-BR')}`
+        ? `${type}:${name.toLowerCase()}`
         : null;
     };
     const existing = new Set(state.categories.map(categoryKey).filter(Boolean));
@@ -317,7 +329,7 @@ async function suggestCategoriesForProduction() {
 
 async function saveCategorySuggestions() {
   const button = $('#category-suggestions-save');
-  const selected = $('#category-suggestion-list input:checked');
+  const selected = $$('#category-suggestion-list input:checked');
   if (!selected.length) return;
   button.disabled = true;
   try {

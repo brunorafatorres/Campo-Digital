@@ -7,7 +7,13 @@ const RULES = [
 export function createProductionCategoryService() {
   return { suggest(activity = {}) {
     const text = [activity.nombre, activity.tipo_producao, activity.produtos_trabalhados, activity.descripcion].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
-    const matched = RULES.find((rule) => rule.keys.some((key) => text.includes(key)));
+    const matchingRules = RULES.filter((rule) => rule.keys.some((key) => text.includes(key)));
+    const allCategories = matchingRules.flatMap((rule) => rule.categories);
+    const uniqueCategories = [...new Map(allCategories.map(([nome, tipo]) => [
+      `${tipo}:${nome.toLowerCase()}`,
+      [nome, tipo],
+    ])).values()];
+    const matched = uniqueCategories.length ? { categories: uniqueCategories } : null;
     const categories = matched?.categories ?? [['Insumos da produção', 'GASTO'], ['Manutenção de equipamentos', 'GASTO'], ['Venda de produção', 'INGRESO']];
     return { origem: 'PERFIL_PRODUTIVO', mensagem: 'Sugestões geradas a partir do seu perfil produtivo. Escolha quais deseja adicionar.', categorias: categories.map(([nome, tipo]) => ({ nome, tipo })) };
   } };
